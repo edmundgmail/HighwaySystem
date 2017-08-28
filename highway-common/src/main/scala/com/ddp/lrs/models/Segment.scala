@@ -8,9 +8,13 @@ import algorithms.SegmentOperations
 class Segment(val start: SegmentPoint, val end : SegmentPoint, val length:Double){
   def StartSegmentPoint = start
   def EndSegmentPoint = SegmentPoint(end.name,end.x,end.y,end.z, length)
+  def containsRP(rp:ReferencePoint) : Boolean = ???
 }
 
 object Segment extends SegmentOperations{
+
+  def apply(start:SegmentPoint, end:SegmentPoint, length: Double) = new Segment(start,end,length)
+
   def removeSegment(cuttee:Segment, cutter:Segment) : List[Segment] = ???
   def overlap(a:Segment, b: Segment): Boolean = ???
   def include(a:Segment, b:Segment) : Boolean = ???
