@@ -1,2 +1,7 @@
 *.class
 *.log
+project/target/*
+project/project/target/*
+highway-common/target/*
+highway-streaming/target/*
+target/*
