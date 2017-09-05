@@ -59,7 +59,7 @@ class Direction(val dir: String, val segments: List[Segment], val rps: List[Refe
           val rightConnectSegment = segments.find(_.containsReferencePoint(beforeRP.get)).get
           val rightConnectSegmentIndex = segments.indexOf(rightConnectSegment)
 
-          assert(leftConnectSegment== rightConnectSegmentIndex - 1)
+          assert(leftConnectSegmentIndex == rightConnectSegmentIndex - 1)
           val overalLength = leftConnectSegment.length+rightConnectSegment.length+segment.length
           val newEnd = SegmentPoint("end", rightConnectSegment.end.referencePoint.withIncrementOffset(segment.length), rightConnectSegment.end.offset)
           val newSegment = Segment(leftConnectSegment.start, newEnd, overalLength )
