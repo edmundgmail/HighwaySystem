@@ -1,5 +1,5 @@
 package com.ddp.lrs.models
-
+import com.ddp.lrs.utils.MyImplicits._
 /**
   * Created by eguo on 8/26/17.
   */
@@ -32,14 +32,15 @@ class Direction(val dir: String, val segments: List[Segment], val rps: List[Refe
 
 
   def addSegmentString(segment:String, afterRP: Option[ReferencePoint], leftConnect: Boolean, beforeRP:Option[ReferencePoint], rightConnect: Boolean): Direction ={
-      val dis = segment.split((",")).zipWithIndex.filter(_._2%2 == 0)
-      val distances = dis.drop(1).map(_._1.toDouble)
+      val dis = segment.split((",")).zipWithIndex.filter(_._2%2 == 0).map(_._1.toDouble)
+      val distances = dis.drop(1).dropRight(1):+0.0
 
-      val globalOffsets = dis.map(d=>dis.take(d._2/2 + 1).map(_._1.toDouble).sum).dropRight(1)
+      val globalOffsets = dis.dropRight(1).zipWithIndex.map(d=>dis.take(d._2+1).sum)
+        //.take(_).map().dropRight(1)
       val rps = segment.split(",").zipWithIndex.filter(_._2 % 2 == 1).map(_._1)
       val newRPs = rps  zip globalOffsets zip distances map (r=>ReferencePoint(r._1._1, r._1._2, r._2))
       val start = SegmentPoint("start", newRPs(0), 0.0 - newRPs(0).globalOffset)
-      val end = SegmentPoint("end", newRPs.last, dis.last._1.toDouble)
+      val end = SegmentPoint("end", newRPs.last, dis.last)
       val segmentNew = Segment(start, end, globalOffsets.last+end.offset)
 
       addSegment(segmentNew, newRPs.toList, afterRP, leftConnect, beforeRP, rightConnect)
@@ -60,7 +61,8 @@ class Direction(val dir: String, val segments: List[Segment], val rps: List[Refe
 
           assert(leftConnectSegment== rightConnectSegmentIndex - 1)
           val overalLength = leftConnectSegment.length+rightConnectSegment.length+segment.length
-          val newSegment = Segment(leftConnectSegment.start, rightConnectSegment.end, overalLength )
+          val newEnd = SegmentPoint("end", rightConnectSegment.end.referencePoint.withIncrementOffset(segment.length), rightConnectSegment.end.offset)
+          val newSegment = Segment(leftConnectSegment.start, newEnd, overalLength )
           val (left, right) = segments.splitAt(leftConnectSegmentIndex)
           val leftRP = afterRP.get.withDistance(leftConnectSegment.end.offset - segment.start.offset)
           val lastRP = newRPs.last.withDistance(segment.end.offset - rightConnectSegment.start.offset)
@@ -73,8 +75,8 @@ class Direction(val dir: String, val segments: List[Segment], val rps: List[Refe
         {
           val leftConnectSegment = segments.find(_.containsReferencePoint(afterRP.get)).get
           val leftConnectSegmentIndex = segments.indexOf(leftConnectSegment)
-
-          val newSegement = Segment(leftConnectSegment.start, segment.end, leftConnectSegment.length+segment.length)
+          val newEnd = SegmentPoint("end", segment.end.referencePoint.withIncrementOffset(leftConnectSegment.end.referencePoint.globalOffset+leftConnectSegment.end.offset),segment.end.offset)
+          val newSegement = Segment(leftConnectSegment.start, newEnd, leftConnectSegment.length+segment.length)
           val (left, right) = segments.splitAt(leftConnectSegmentIndex)
           val leftRP = afterRP.get.withDistance(leftConnectSegment.end.offset - segment.start.offset)
           val newRPs1 = newRPs.map(_.withIncrementOffset(leftConnectSegment.end.referencePoint.globalOffset+leftConnectSegment.end.offset))
@@ -86,8 +88,8 @@ class Direction(val dir: String, val segments: List[Segment], val rps: List[Refe
         {
           val rightConnectSegment = segments.find(_.containsReferencePoint(beforeRP.get)).get
           val rightConnectSegmentIndex = segments.indexOf(rightConnectSegment)
-
-          val newSegement = Segment(segment.start, rightConnectSegment.end, rightConnectSegment.length+segment.length)
+          val newEnd = SegmentPoint("end", rightConnectSegment.end.referencePoint.withIncrementOffset(segment.length), rightConnectSegment.end.offset)
+          val newSegement = Segment(segment.start, newEnd, rightConnectSegment.length+segment.length)
           val (left, right) = segments.splitAt(rightConnectSegmentIndex)
           val rightRP = newRPs.last.withDistance( segment.end.offset - rightConnectSegment.start.offset )
           val newRPs1 = (newRPs.dropRight(1):+rightRP).map(_.withIncrementOffset(rightConnectSegment.start.offset))
@@ -105,7 +107,10 @@ class Direction(val dir: String, val segments: List[Segment], val rps: List[Refe
             val (left, right) = segments.splitAt(leftConnectSegmentIndex + 1)
             val newRPs1 = newRPs.map(_.withIncrementOffset(leftConnectSegment.end.offset+leftConnectSegment.end.referencePoint.globalOffset))
             val newRPList = mergedRPs(newRPs1, afterRP, beforeRP, leftConnect,rightConnect, segment.length)
-            Direction(dir, (left :+ segment) ++ right, newRPList)
+            val newStart = SegmentPoint(segment.start.name, segment.start.referencePoint.withIncrementOffset(leftConnectSegment.end.referencePoint.globalOffset+leftConnectSegment.end.offset), segment.start.offset)
+            val newEnd = SegmentPoint(segment.end.name, segment.end.referencePoint.withIncrementOffset(leftConnectSegment.end.referencePoint.globalOffset+leftConnectSegment.end.offset), segment.end.offset)
+            val newSegment = Segment(newStart, newEnd, segment.length)
+            Direction(dir, (left :+ newSegment) ++ right, newRPList)
           }
           case(_, Some(x)) =>{
             val rightConnectSegment = segments.find(_.containsReferencePoint(x)).get
@@ -134,6 +139,8 @@ class Direction(val dir: String, val segments: List[Segment], val rps: List[Refe
       case _=> false
     }
   }
+
+  override def toString: String = s"{Direction dir=${dir} segments]s${segments.toString} rps=s${rps.toString} }"
 }
 
 object Direction{
