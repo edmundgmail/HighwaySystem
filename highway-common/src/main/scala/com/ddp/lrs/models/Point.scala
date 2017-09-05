@@ -40,4 +40,17 @@ case class ReferencePoint(override val name: String, val globalOffset: Double, v
       case  _=> false
     }
   }
+
+  def same(that:ReferencePoint) : Boolean = super.equals(that)
 }
+
+object ReferencePoint{
+    def findIndex(rps:List[ReferencePoint], rp:ReferencePoint) : Int= {
+      val f = rps.zipWithIndex.filter(r=>rp.same(r._1))
+      if(f.isEmpty) -1
+      else f(0)._2
+    }
+}
+
+
+

@@ -14,7 +14,7 @@ class Direction(val dir: String, val segments: List[Segment], val rps: List[Refe
           throw new Exception("Before and after RP can't be both None ")
       }
       case (Some(x), _) => {
-        val (left, right) = rps.splitAt(rps.indexOf(x) + 1)
+        val (left, right) = rps.splitAt(ReferencePoint.findIndex(rps, x) + 1)
         val newRight = right.map(_.withIncrementOffset(length))
 
         val newLeft = if(leftConnect) left.dropRight(1) :+ afterRP.get else left
@@ -22,7 +22,7 @@ class Direction(val dir: String, val segments: List[Segment], val rps: List[Refe
       }
 
       case (None, Some(x)) => {
-        val (left, right) = rps.splitAt(rps.indexOf(x))
+        val (left, right) = rps.splitAt(ReferencePoint.findIndex(rps,x))
         val newRight = right.map(_.withIncrementOffset(length))
 
         left ++ inserted ++ newRight
@@ -67,7 +67,7 @@ class Direction(val dir: String, val segments: List[Segment], val rps: List[Refe
           val leftRP = afterRP.get.withDistance(leftConnectSegment.end.offset - segment.start.offset)
           val lastRP = newRPs.last.withDistance(segment.end.offset - rightConnectSegment.start.offset)
           val newRPs1 = (newRPs.dropRight(1):+lastRP).map(_.withIncrementOffset(leftConnectSegment.end.referencePoint.globalOffset+leftConnectSegment.end.offset))
-          val newRPList = mergedRPs(newRPs1, Some(leftRP), afterRP,  leftConnect, rightConnect, segment.length)
+          val newRPList = mergedRPs(newRPs1, Some(leftRP), beforeRP,  leftConnect, rightConnect, segment.length)
           Direction(dir, (left :+ newSegment) ::: right.drop(2), newRPList)
         }
 
@@ -80,7 +80,7 @@ class Direction(val dir: String, val segments: List[Segment], val rps: List[Refe
           val (left, right) = segments.splitAt(leftConnectSegmentIndex)
           val leftRP = afterRP.get.withDistance(leftConnectSegment.end.offset - segment.start.offset)
           val newRPs1 = newRPs.map(_.withIncrementOffset(leftConnectSegment.end.referencePoint.globalOffset+leftConnectSegment.end.offset))
-          val newRPList =  mergedRPs(newRPs1, afterRP, beforeRP, leftConnect, rightConnect, segment.length)
+          val newRPList =  mergedRPs(newRPs1, Some(leftRP), beforeRP, leftConnect, rightConnect, segment.length)
           Direction(dir, (left :+ newSegement) ::: right.drop(1), newRPList)
         }
 
