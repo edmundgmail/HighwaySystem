@@ -1,5 +1,8 @@
 package com.ddp.lrs.models
 import com.ddp.lrs.utils.MyImplicits._
+
+import scala.util.MurmurHash
+import scala.util.hashing.MurmurHash3
 /**
   * Created by eguo on 8/26/17.
   */
@@ -12,23 +15,24 @@ class Point (val name: String, val x: Double, val y:Double, val z:Double){
   }
 }
 
-case class SegmentPoint(override val name: String, referencePoint: ReferencePoint, offset: Double, override val x: Double = 0, override val y:Double = 0, override val z:Double = 0) extends Point(name,x,y,z){
+case class SegmentPoint(override val name: String, referencePoint: Int, offset: Double, override val x: Double = 0, override val y:Double = 0, override val z:Double = 0) extends Point(name,x,y,z){
   override def toString: String = {
     s"{ SegmentPoint RP = ${referencePoint} offset=${offset}"
   }
 
   override def equals(obj: Any): Boolean = {
     obj match {
-      case that:SegmentPoint => this.referencePoint.same(that.referencePoint) && that.offset =~= this.offset
+      case that:SegmentPoint => this.referencePoint == that.referencePoint && that.offset =~= this.offset
       case _ => false
     }
   }
 }
 
-case class ReferencePoint(override val name: String, val globalOffset: Double, val distance: Double, override val x: Double = 0, override val y:Double = 0, override val z:Double = 0) extends Point(name, x, y, z)
+case class ReferencePoint(override val name: String, val roadName:String, val dir:String, val globalOffset: Double, val distance: Double, override val x: Double = 0, override val y:Double = 0, override val z:Double = 0) extends Point(name, x, y, z)
 {
-  def withIncrementOffset(offset:Double) = ReferencePoint(name, globalOffset+offset, distance, x,y,z)
-  def withDistance(d:Double) = ReferencePoint(name, globalOffset, d, x,y,z)
+  def withIncrementOffset(offset:Double) = ReferencePoint(name, roadName, dir, globalOffset+offset, distance, x,y,z)
+  def withDistance(d:Double) = ReferencePoint(name, roadName, dir, globalOffset, d, x,y,z)
+  def ID =MurmurHash3.stringHash((roadName, dir, name).toString)
 
   override def toString: String = {
     s"{RP name=${name} distance=${distance} globaloffset=${globalOffset}}"
@@ -41,7 +45,7 @@ case class ReferencePoint(override val name: String, val globalOffset: Double, v
     }
   }
 
-  def same(that:ReferencePoint) : Boolean = super.equals(that)
+  def same(that:ReferencePoint) : Boolean = this.ID == that.ID
 }
 
 object ReferencePoint{
@@ -50,6 +54,12 @@ object ReferencePoint{
       if(f.isEmpty) -1
       else f(0)._2
     }
+
+   def getByID(ID:Int, rps:List[ReferencePoint]) : Option[ReferencePoint] = {
+      val rpIDs = rps.filter(_.ID==ID)
+      if(rpIDs.isEmpty) None
+      else Some(rpIDs(0))
+   }
 }
 
 
