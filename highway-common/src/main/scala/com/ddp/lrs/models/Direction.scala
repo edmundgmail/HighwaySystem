@@ -91,7 +91,7 @@ class Direction(val dir: String, val segments: List[Segment], val rps: List[Refe
           val newSegement = Segment(segment.start, newEnd, rightConnectSegment.length+segment.length)
           val (left, right) = segments.splitAt(rightConnectSegmentIndex)
           val rightRP = newRPs.last.withDistance( segment.end.offset - rightConnectSegment.start.offset )
-          val newRPs1 = (newRPs.dropRight(1):+rightRP).map(_.withIncrementOffset(rightConnectSegment.start.offset))
+          val newRPs1 = (newRPs.dropRight(1):+rightRP).map(_.withIncrementOffset(rightConnectSegment.start.referencePoint.globalOffset+rightConnectSegment.start.offset))
           val newRPList = mergedRPs(newRPs1, afterRP, beforeRP, leftConnect,rightConnect, segment.length)
           Direction(dir, (left :+ newSegement) ::: right.drop(1), newRPList)
         }
@@ -149,6 +149,8 @@ object Direction{
 
   def fromString(dir:String, road: List[String]) : Direction = {
     val (_segs, _rps) = road.map(str=>Segment.fromString(str)).unzip
-    Direction(dir, _segs, _rps.flatten)
+    val segOffsets = _segs.zipWithIndex.map(s=>_segs.take(s._2).map(_.length).sum)
+    val newRPs = _rps.zipWithIndex.map(l=>l._1.map(_.withIncrementOffset(segOffsets(l._2)))).flatten
+    Direction(dir, _segs, newRPs)
   }
 }

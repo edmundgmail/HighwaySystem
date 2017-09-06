@@ -168,27 +168,7 @@ class TestAddSegment extends Testing with Logging{
 
     val direction1 = direction_1.addSegmentString("1.3,RP1,2.0,RP2,2.5,RP3,3.6", None,false, None,false)
     val direction2 = direction1.addSegmentString("2.1,RP4,2.2,RP5,2.3,RP6,2.7", Some(RP3), false, None, false)
-    val RP3C = ReferencePoint("RP3", 5.8, 4.8)
-
     val direction3 = direction2.addSegmentString("1.2,RP7,2.1,RP8,1.5,RP9,0.9", Some(RP3), false, Some(RP4), true)
-
-    val RP7 = ReferencePoint("RP7", 10.6, 2.1)
-    val RP8 = ReferencePoint("RP8", 12.7, 1.5)
-    val RP9 = ReferencePoint("RP9", 14.2, 0.0)
-    val RP9C = ReferencePoint("RP9", 14.2, 3.0)
-
-    val RP4C = ReferencePoint("RP4", 17.2 , 2.2)
-    val RP5C = ReferencePoint("RP5", 19.4, 2.3)
-    val RP6C = ReferencePoint("RP6", 21.7, 0)
-    val start = SegmentPoint("start", RP1, -1.3)
-    val end = SegmentPoint("end", RP3, 3.6)
-
-    val end1D = SegmentPoint("end", RP9, 0.9)
-    val segment_1 = Segment(start,end, length = 9.4)
-
-    val start1 = SegmentPoint("start", RP7, 1.2)
-    val end1 = SegmentPoint("end", RP6, 2.7)
-    val segment_2D = Segment(start1,end1, length = 9.3+5.7)
 
     val TEST_DIRECTION1 = Direction.fromString("E", List("1.3,RP1,2.0,RP2,2.5,RP3,3.6",
         "1.2,RP7,2.1,RP8,1.5,RP9, 3.0,RP4,2.2,RP5,2.3,RP6,2.7"))

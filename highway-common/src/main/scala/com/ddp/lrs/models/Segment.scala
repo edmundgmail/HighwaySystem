@@ -40,8 +40,9 @@ object Segment{
   def fromString(segment:String) : (Segment, List[ReferencePoint]) = {
     val dis = segment.split(",").zipWithIndex.filter(_._2%2 == 0).map(_._1.toDouble)
     val rpnames = segment.split(",").zipWithIndex.filter(_._2%2 == 1).map(_._1)
+    val globalOffsets = dis.dropRight(1).zipWithIndex.map(d=>dis.take(d._2+1).sum)
 
-    val rps = rpnames  zip dis.drop(1).dropRight(1) :+ 0.0 map(r=>ReferencePoint(r._1, 0, r._2))
+    val rps = rpnames zip globalOffsets zip dis.drop(1).dropRight(1) :+ 0.0 map(r=>ReferencePoint(r._1._1, r._1._2, r._2))
     val seg = Segment(SegmentPoint("start", rps(0), 0 - dis(0)), SegmentPoint("end", rps.last, dis.last), dis.sum)
     (seg, rps.toList)
   }
