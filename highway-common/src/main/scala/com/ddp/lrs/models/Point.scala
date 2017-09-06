@@ -19,7 +19,7 @@ case class SegmentPoint(override val name: String, referencePoint: ReferencePoin
 
   override def equals(obj: Any): Boolean = {
     obj match {
-      case that:SegmentPoint => that.referencePoint == this.referencePoint && that.offset =~= this.offset
+      case that:SegmentPoint => this.referencePoint.same(that.referencePoint) && that.offset =~= this.offset
       case _ => false
     }
   }

@@ -23,6 +23,12 @@ class Segment(val start: SegmentPoint, val end : SegmentPoint, val length:Double
 
   def minus (segment:Segment) : List[Segment] = ???
 
+  def withIncrementOffset(offset:Double) : Segment = {
+      val newStart = SegmentPoint(this.start.name, this.start.referencePoint.withIncrementOffset(offset), this.start.offset)
+      val newEnd = SegmentPoint(this.end.name, this.end.referencePoint.withIncrementOffset(offset), this.end.offset)
+      Segment(newStart,newEnd, this.length)
+  }
+
   override def toString: String = {
     s"{Segment start=${start} end=${end} length=${length}"
   }
@@ -30,4 +36,13 @@ class Segment(val start: SegmentPoint, val end : SegmentPoint, val length:Double
 
 object Segment{
   def apply(start:SegmentPoint, end:SegmentPoint, length: Double) = new Segment(start,end,length)
+
+  def fromString(segment:String) : (Segment, List[ReferencePoint]) = {
+    val dis = segment.split(",").zipWithIndex.filter(_._2%2 == 0).map(_._1.toDouble)
+    val rpnames = segment.split(",").zipWithIndex.filter(_._2%2 == 1).map(_._1)
+
+    val rps = rpnames  zip dis.drop(1).dropRight(1) :+ 0.0 map(r=>ReferencePoint(r._1, 0, r._2))
+    val seg = Segment(SegmentPoint("start", rps(0), 0 - dis(0)), SegmentPoint("end", rps.last, dis.last), dis.sum)
+    (seg, rps.toList)
+  }
 }

@@ -4,7 +4,6 @@ import com.ddp.lrs.utils.MyImplicits._
   * Created by eguo on 8/26/17.
   */
 class Direction(val dir: String, val segments: List[Segment], val rps: List[ReferencePoint]) {
-
   private def mergedRPs(inserted: List[ReferencePoint], afterRP:Option[ReferencePoint], beforeRP:Option[ReferencePoint], leftConnect:Boolean, rightConnect:Boolean, length:Double): List[ReferencePoint] ={
     (afterRP, beforeRP) match {
       case (None, None) => {
@@ -140,9 +139,16 @@ class Direction(val dir: String, val segments: List[Segment], val rps: List[Refe
     }
   }
 
-  override def toString: String = s"{Direction dir=${dir} segments]s${segments.toString} rps=s${rps.toString} }"
+  override def toString: String = {
+    s"{Direction dir=${dir} segments]s${segments.toString} rps=s${rps.toString} }"
+  }
 }
 
 object Direction{
   def apply(dir:String, segments:List[Segment], rps: List[ReferencePoint]) = new Direction(dir, segments, rps)
+
+  def fromString(dir:String, road: List[String]) : Direction = {
+    val (_segs, _rps) = road.map(str=>Segment.fromString(str)).unzip
+    Direction(dir, _segs, _rps.flatten)
+  }
 }
