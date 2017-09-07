@@ -1,11 +1,12 @@
-package com.ddp.lrs
+package com.lrs.streaming
 
 import java.io.File
 import java.nio.file.{Files, Paths}
 
-import com.ddp.lrs.models.{DataRecord, DataRecordDeserializer, Road}
-import com.ddp.lrs.processor.RoadProcessor
 import com.google.gson.GsonBuilder
+import com.lrs.common.ConfigFields
+import com.lrs.common.models.{DataRecord, DataRecordDeserializer, Road}
+import com.lrs.common.processor.RoadProcessor
 import com.typesafe.config.{Config, ConfigFactory}
 import org.apache.spark.{SparkConf, SparkContext}
 

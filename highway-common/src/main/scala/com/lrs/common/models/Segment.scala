@@ -1,6 +1,6 @@
-package com.ddp.lrs.models
+package com.lrs.common.models
 
-import com.ddp.lrs.utils.MyImplicits._
+import com.lrs.common.utils.MyImplicits._
 /**
   * Created by eguo on 8/26/17.
   */

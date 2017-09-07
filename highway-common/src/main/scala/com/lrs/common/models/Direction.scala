@@ -1,4 +1,5 @@
-package com.ddp.lrs.models
+package com.lrs.common.models
+
 /**
   * Created by eguo on 8/26/17.
   */

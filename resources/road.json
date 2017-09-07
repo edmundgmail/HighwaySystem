@@ -2,20 +2,15 @@
   "action": "AddRoadRecord",
   "roadName": "Hero High Way",
   "dateTime" : "20170101 01:10:10",
-  "roadId": 1,
   "mainDir": "E",
   "directions": [
     {
       "dir": "E",
-      "RPs" : "RP1, 1.3, RP2, 2.6, RP3,,RP4, 6.3, RP5, 3.5, RP6",
-      "segments": [
-        {"start" : {"rp": "RP1", "offset": -1.5}, "end": {"rp":"RP3", "offset": 2.3} },
-        {"start" : {"rp": "RP4", "offset": -2.5}, "end": {"rp": "RP6", "offset":2.1}}
-      ]
+      "segments" : ["1.8,RP1,2.1,RP2,1.0","1.9,RP3,2.3,RP4,0.9,RP5,0.5"]
     },
     {
       "dir": "W",
-      "segments": []
+      "segments": ["2.9,RP1,1.1,RP2,3.0","2.9,RP3,2.5,RP4,0.9,RP5,0.6"]
     }
   ]
 }
@@ -23,7 +18,7 @@
   {
     "action" : "RemoveSegmentRecord",
     "dateTime" : "20170101 10:10:10",
-    "roadId" : 1,
+    "roadName": "Hero High Way",
     "dir" : "E",
     "startPoint" : "RP1, 0.9", "endPoint": "RP2, 1.3"
   }
@@ -32,13 +27,12 @@
   {
     "action" : "AddSegmentRecord",
     "dateTime" : "20170101 11:10:10",
-    "roadId" : 1,
+    "roadName": "Hero High Way",
     "dir" : "E",
-    "startPoint" : "RP1, 0.9",
-    "endPoint": "RP2, 1.3",
-    "RPs" : "RP1,2.5,RP21,,RP3",
+    "afterRP" : "RP1",
+    "beforeRP": "RP3",
+    "segment" : "0.7, RP6,2.5,RP7,1.9,RP8,0.3",
     "leftConnect" : true,
     "rightConnect": true
   }
 ]
-

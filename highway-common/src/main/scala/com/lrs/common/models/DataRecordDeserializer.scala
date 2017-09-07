@@ -1,12 +1,13 @@
-package com.ddp.lrs.models
+package com.lrs.common.models
 
 /**
   * Created by vagrant on 9/7/17.
   */
 import java.lang.reflect.Type
 
-import scala.collection.mutable
 import com.google.gson._
+
+import scala.collection.mutable
 
 /**
   * Created by vagrant on 8/18/17.

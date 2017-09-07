@@ -1,7 +1,7 @@
-package com.ddp.lrs.models
+package com.lrs.common.models
 
-import com.ddp.lrs.logging.Logging
-import com.ddp.lrs.utils.Testing
+import com.lrs.common.logging.Logging
+import com.lrs.common.utils.Testing
 
 /**
   * Created by vagrant on 8/29/17.

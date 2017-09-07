@@ -1,6 +1,4 @@
-package com.ddp.lrs.utils
-
-import com.ddp.lrs.models.SegmentPoint
+package com.lrs.common.utils
 
 /**
   * Created by eguo on 9/4/17.

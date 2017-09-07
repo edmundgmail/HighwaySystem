@@ -1,4 +1,4 @@
-package com.ddp.lrs.models
+package com.lrs.common.models
 
 /**
   * Created by eguo on 8/26/17.
@@ -10,4 +10,5 @@ class Road(val name:String, val mainDir: String, directions: List[Direction]) {
 object Road{
   def apply(name:String, mainDir: String, directions: List[Direction]): Road = new Road(name, mainDir, directions)
 
+  def fromJson(record: AddRoadRecord) : Road = ???
 }

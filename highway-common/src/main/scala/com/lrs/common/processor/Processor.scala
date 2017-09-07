@@ -1,4 +1,4 @@
-package com.ddp.lrs.processor
+package com.lrs.common.processor
 
 import org.apache.spark.SparkContext
 

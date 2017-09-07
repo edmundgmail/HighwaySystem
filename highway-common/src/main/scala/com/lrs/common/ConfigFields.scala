@@ -1,4 +1,4 @@
-package com.ddp.lrs
+package com.lrs.common
 
 /**
   * Created by vagrant on 9/7/17.

@@ -1,4 +1,4 @@
-package com.ddp.lrs.logging
+package com.lrs.common.logging
 
 import java.lang.management.ManagementFactory
 

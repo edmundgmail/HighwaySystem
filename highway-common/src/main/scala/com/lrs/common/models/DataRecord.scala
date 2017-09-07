@@ -1,4 +1,4 @@
-package com.ddp.lrs.models
+package com.lrs.common.models
 
 /**
   * Created by vagrant on 8/18/17.

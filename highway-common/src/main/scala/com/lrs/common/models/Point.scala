@@ -1,8 +1,8 @@
-package com.ddp.lrs.models
-
-import com.ddp.lrs.utils.MyImplicits._
+package com.lrs.common.models
 
 import scala.util.hashing.MurmurHash3
+import com.lrs.common.utils.MyImplicits._
+
 /**
   * Created by eguo on 8/26/17.
   */

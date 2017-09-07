@@ -1,4 +1,4 @@
-package com.ddp.lrs.utils
+package com.lrs.common.utils
 
 import java.io.File
 
