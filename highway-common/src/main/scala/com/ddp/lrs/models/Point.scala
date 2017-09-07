@@ -17,9 +17,10 @@ class Point (val name: String, val x: Double, val y:Double, val z:Double){
 
 case class SegmentPoint(override val name: String, referencePoint: Int, offset: Double, override val x: Double = 0, override val y:Double = 0, override val z:Double = 0) extends Point(name,x,y,z){
   override def toString: String = {
-    s"{ SegmentPoint RP = ${referencePoint} offset=${offset}"
+    s"SegmentPoint RP = ${referencePoint} offset=${offset}"
   }
 
+  def formalize: 
   override def equals(obj: Any): Boolean = {
     obj match {
       case that:SegmentPoint => this.referencePoint == that.referencePoint && that.offset =~= this.offset

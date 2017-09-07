@@ -4,6 +4,32 @@ import com.ddp.lrs.utils.MyImplicits._
   * Created by eguo on 8/26/17.
   */
 class Direction(val dir: String, val segments: List[Segment], val rps: List[ReferencePoint]) {
+
+  def removeSegment(segment:Segment, removeRP:Boolean = true) : Direction = {
+      val seg = segments.filter(_.contains(rps, segment))
+      if(seg.isEmpty){
+          throw new Exception("Can't find the segment to be removed")
+      }
+      val segIndex = segments.indexOf(seg(0))
+      val (left, right) = segments.splitAt(segIndex)
+
+      val remainingRPs = if(!removeRP) rps else {
+          val list = segment.containedReferencePoints(rps)
+          if(!list.isEmpty)
+           {
+              val index = rps.indexOf(list(0))
+              val (left, right) = rps.splitAt(index)
+              val newLeft = if(!left.isEmpty) left.dropRight(1) :+ left.last.withDistance(0) else left
+              val newRight = right.drop(list.size).map(_.withIncrementOffset(0 - segment.length))
+             newLeft ++ newRight
+           }
+          else
+            rps
+      }
+
+      Direction(dir, left ++ seg(0).minus(segment, rps) ++ right.drop(1), remainingRPs)
+  }
+
   private def mergedRPs(inserted: List[ReferencePoint], afterRP:Option[ReferencePoint], beforeRP:Option[ReferencePoint], leftConnect:Boolean, rightConnect:Boolean, length:Double): List[ReferencePoint] ={
     (afterRP, beforeRP) match {
       case (None, None) => {
@@ -119,10 +145,6 @@ class Direction(val dir: String, val segments: List[Segment], val rps: List[Refe
         }
       }
     }
-  }
-
-  def removeSegment(segment:Segment, removeRP:Boolean) : Direction = {
-    null
   }
 
   override def equals(obj: scala.Any): Boolean = {

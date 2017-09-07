@@ -7,6 +7,16 @@ import com.ddp.lrs.utils.MyImplicits._
 
 class Segment(val start: SegmentPoint, val end : SegmentPoint, val length:Double){
 
+  def contains(rps: List[ReferencePoint], seg:Segment) : Boolean = {
+    val thisStart = ReferencePoint.getByID(start.referencePoint, rps)
+    val thisEnd = ReferencePoint.getByID(end.referencePoint, rps)
+    val thatStart = ReferencePoint.getByID(seg.start.referencePoint, rps)
+    val thatEnd = ReferencePoint.getByID(seg.end.referencePoint, rps)
+    assert(thisStart.isDefined && thisEnd.isDefined && thatStart.isDefined && thatEnd.isDefined)
+    return thisStart.get.globalOffset+start.offset <= thatStart.get.globalOffset+seg.start.offset &&
+          thisEnd.get.globalOffset + end.offset >= thatEnd.get.globalOffset+seg.end.offset
+  }
+
   def containsReferencePoint(rp:ReferencePoint, rps:List[ReferencePoint]) : Boolean = {
     val startRP = ReferencePoint.getByID(start.referencePoint, rps)
     val endRP = ReferencePoint.getByID(end.referencePoint, rps)
@@ -21,6 +31,10 @@ class Segment(val start: SegmentPoint, val end : SegmentPoint, val length:Double
       false
   }
 
+  def containedReferencePoints(rps:List[ReferencePoint]) : List[ReferencePoint] = {
+    rps.filter(r=>containsReferencePoint(r, rps))
+  }
+
   override def equals(obj: scala.Any): Boolean = {
     obj match {
       case that:Segment => that.start == start && that.end == end && that.length =~= length
@@ -28,14 +42,30 @@ class Segment(val start: SegmentPoint, val end : SegmentPoint, val length:Double
     }
   }
 
-  def minus (segment:Segment) : List[Segment] = ???
+  def minus (segment:Segment, rps:List[ReferencePoint]) : List[Segment] = {
+      if(segment.start==this.start && segment.end==this.end) {
+        List.empty
+      }
+      else if(segment.start==this.start){
+        List(Segment(segment.end, this.end, this.length-segment.length))
+      }
+      else if(segment.end == this.end){
+        List(Segment(this.start, segment.start, this.length-segment.length))
+      }
+      else {
+        val thisStart = ReferencePoint.getByID(start.referencePoint, rps)
+        val thisEnd = ReferencePoint.getByID(end.referencePoint, rps)
+        val thatStart = ReferencePoint.getByID(segment.start.referencePoint, rps)
+        val thatEnd = ReferencePoint.getByID(segment.end.referencePoint, rps)
 
-  def withIncrementOffset(offset:Double) : Segment = {
-    this
+        val leftLength = thatStart.get.globalOffset+segment.start.offset - (thisStart.get.globalOffset+start.offset)
+        val rightLength = thisEnd.get.globalOffset + end.offset - (thatEnd.get.globalOffset+segment.end.offset)
+        List(Segment(this.start, segment.start, leftLength),Segment(segment.end, this.end, rightLength))
+      }
   }
 
   override def toString: String = {
-    s"{Segment start=${start} end=${end} length=${length}"
+    s"{Segment start=${start} end=${end} length=${length}}"
   }
 }
 
