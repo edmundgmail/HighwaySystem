@@ -12,10 +12,10 @@ val meta = """META.INF(.)*""".r
 /**
   * Dependencies
   */
-val hadoopCommon          = "org.apache.hadoop"               %     "hadoop-common"                 %  "2.7.1"   % "provided"
+val hadoopCommon          = "org.apache.hadoop"               %     "hadoop-common"                 %  "2.7.1"  // % "provided"
 val hadoopCommonNotProvided  = "org.apache.hadoop"            %     "hadoop-common"                 %  "2.7.1"
 val hadoopCommonTest      = "org.apache.hadoop"               %     "hadoop-common"                 %  "2.7.1"   % "test" classifier "tests"
-val hdfs                  = "org.apache.hadoop"               %     "hadoop-hdfs"                   %  "2.7.1"   % "provided"
+val hdfs                  = "org.apache.hadoop"               %     "hadoop-hdfs"                   %  "2.7.1"  // % "provided"
 val hdfsNotProvided       = "org.apache.hadoop"               %     "hadoop-hdfs"                   %  "2.7.1"
 val hdfsTest              = "org.apache.hadoop"               %     "hadoop-hdfs"                   %  "2.7.1"   % "test" classifier "tests"
 val hadoopMiniCluster     = "org.apache.hadoop"               %     "hadoop-minicluster"            %  "2.7.1"   % "test"
@@ -37,9 +37,10 @@ val mockito               = "org.mockito"                     %     "mockito-all
 val nifiSparkReceiver     = "org.apache.nifi"                 %     "nifi-spark-receiver"           %  "0.7.0"
 val scalaTest             = "org.scalatest"                   %%    "scalatest"                     %  "2.2.6"   % "test"
 val scalaMock             = "org.scalamock"                   %%    "scalamock-scalatest-support"   %  "3.2.2"   % "test"
-val sparkCore             = "org.apache.spark"                %%    "spark-core"                    %  "2.0.2"   % "provided"
-val sparkStreaming        = "org.apache.spark"                %%    "spark-streaming"               %  "2.0.2"   % "provided"
+val sparkCore             = "org.apache.spark"                %%    "spark-core"                    %  "2.0.2"   //% "provided"
+val sparkStreaming        = "org.apache.spark"                %%    "spark-streaming"               %  "2.0.2"   //% "provided"
 val typesafeConfig        = "com.typesafe"                    %     "config"                        %  "1.3.0"
+val gson                  = "com.google.code.gson"            %     "gson"                          % "2.8.1"
 
 
 /**
@@ -94,7 +95,7 @@ lazy val streaming = (project in file("highway-streaming")).
   settings(commonSettings: _*).
   settings(
 
-    libraryDependencies ++= Seq(sparkCore, sparkStreaming, scalaTest, scalaMock),
+    libraryDependencies ++= Seq(sparkCore, sparkStreaming, gson, scalaTest, scalaMock),
     mainClass in Compile := Some("com.ddp.highway.Driver"),
     mainClass in run := Some("com.ddp.highway.Driver"),
     assemblyMergeStrategy in assembly := {
