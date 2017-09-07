@@ -47,7 +47,7 @@ class Segment(val start: SegmentPoint, val end : SegmentPoint, val length:Double
         List.empty
       }
       else if(segment.start==this.start){
-        List(Segment(segment.end, this.end, this.length-segment.length))
+        List(Segment(segment.end.useNext(rps), this.end, this.length-segment.length))
       }
       else if(segment.end == this.end){
         List(Segment(this.start, segment.start, this.length-segment.length))
@@ -60,7 +60,7 @@ class Segment(val start: SegmentPoint, val end : SegmentPoint, val length:Double
 
         val leftLength = thatStart.get.globalOffset+segment.start.offset - (thisStart.get.globalOffset+start.offset)
         val rightLength = thisEnd.get.globalOffset + end.offset - (thatEnd.get.globalOffset+segment.end.offset)
-        List(Segment(this.start, segment.start, leftLength),Segment(segment.end, this.end, rightLength))
+        List(Segment(this.start, segment.start, leftLength),Segment(segment.end.useNext(rps), this.end, rightLength))
       }
   }
 

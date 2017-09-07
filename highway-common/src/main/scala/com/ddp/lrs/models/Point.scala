@@ -20,7 +20,26 @@ case class SegmentPoint(override val name: String, referencePoint: Int, offset: 
     s"SegmentPoint RP = ${referencePoint} offset=${offset}"
   }
 
-  def formalize: 
+  def useNext(rps: List[ReferencePoint]):SegmentPoint = {
+      val i = ReferencePoint.findIDIndex(referencePoint, rps)
+      assert(i>=0)
+      if(i>=rps.length - 1) this
+      else  {
+        assert(rps(i).distance>0)
+        SegmentPoint(name, rps(i+1).ID, offset - rps(i).distance, x,y,z)
+      }
+  }
+
+  def usePrev(rps:List[ReferencePoint]) : SegmentPoint= {
+    val i = ReferencePoint.findIDIndex(referencePoint, rps)
+    assert(i>=0)
+    if(i==0) this
+    else {
+      assert(rps(i-1).distance>0)
+      SegmentPoint(name, rps(i-1).ID, offset + rps(i-1).distance, x,y,z)
+    }
+  }
+
   override def equals(obj: Any): Boolean = {
     obj match {
       case that:SegmentPoint => this.referencePoint == that.referencePoint && that.offset =~= this.offset
@@ -54,6 +73,12 @@ object ReferencePoint{
       val f = rps.zipWithIndex.filter(r=>rp.same(r._1))
       if(f.isEmpty) -1
       else f(0)._2
+    }
+
+    def findIDIndex(ID:Int, rps:List[ReferencePoint]):Int = {
+        val rpIDs = rps.zipWithIndex.filter(_._1.ID == ID)
+        if(rpIDs.isEmpty) -1
+        else rpIDs(0)._2
     }
 
    def getByID(ID:Int, rps:List[ReferencePoint]) : Option[ReferencePoint] = {
