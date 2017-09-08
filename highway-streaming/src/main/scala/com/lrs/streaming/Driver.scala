@@ -5,6 +5,7 @@ import java.nio.file.{Files, Paths}
 
 import com.google.gson.GsonBuilder
 import com.lrs.common.ConfigFields
+import com.lrs.common.logging.Logging
 import com.lrs.common.models.{DataRecord, DataRecordDeserializer, Road}
 import com.lrs.common.processor.RoadProcessor
 import com.typesafe.config.{Config, ConfigFactory}
@@ -16,7 +17,7 @@ import scala.util.Try
 /**
   * Created by vagrant on 6/21/17.
   */
-object Driver{
+object Driver extends Logging{
 
   private def createSparkContext(sparkConfig: SparkConf): SparkContext = new SparkContext(sparkConfig)
 
@@ -53,5 +54,7 @@ object Driver{
     for(record<-records){
       road = RoadProcessor.process(sc, road, record)
     }
+
+    logger.info(road.toString)
   }
 }

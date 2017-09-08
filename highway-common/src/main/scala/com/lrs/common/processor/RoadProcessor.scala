@@ -1,6 +1,6 @@
 package com.lrs.common.processor
 
-import com.lrs.common.models.{AddRoadRecord, DataRecord, RemoveSegmentRecord, Road}
+import com.lrs.common.models._
 import org.apache.spark.SparkContext
 
 /**
@@ -11,11 +11,14 @@ object RoadProcessor extends Processor[Road, DataRecord] {
     override def process(sc: SparkContext, road: Road, dataRecord: DataRecord): Road = {
     dataRecord match {
       case r: AddRoadRecord => {
-        road
+        Road.fromJson(r)
       }
 
       case r: RemoveSegmentRecord => {
         road
+      }
+      case r: AddSegmentRecord => {
+          road.
       }
 
       case _ => throw new Exception("can't recognize the action")

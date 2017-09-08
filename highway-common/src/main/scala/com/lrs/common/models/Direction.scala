@@ -5,11 +5,17 @@ package com.lrs.common.models
   */
 class Direction(val dir: String, val segments: List[Segment], val rps: List[ReferencePoint]) {
 
-  def removeSegment(segment:Segment, removeRP:Boolean = true) : Direction = {
+  def removeSegment(start: SegmentPoint, end:SegmentPoint, removeRP:Boolean = true) : Direction = {
+      val segment
       val seg = segments.filter(_.contains(rps, segment))
       if(seg.isEmpty){
           throw new Exception("Can't find the segment to be removed")
       }
+
+      val rp1 = ReferencePoint.findIDIndex(segment.start.referencePoint,rps)
+      val rp2 = ReferencePoint.findIDIndex(segment.end.referencePoint,rps)
+
+      val length = rps.slice(rp1, rp2).map(_.distance).sum - segment.start.offset + segment.end.offset
       val segIndex = segments.indexOf(seg(0))
       val (left, right) = segments.splitAt(segIndex)
 
@@ -20,7 +26,7 @@ class Direction(val dir: String, val segments: List[Segment], val rps: List[Refe
               val index = rps.indexOf(list(0))
               val (left, right) = rps.splitAt(index)
               val newLeft = if(!left.isEmpty) left.dropRight(1) :+ left.last.withDistance(0) else left
-              val newRight = right.drop(list.size).map(_.withIncrementOffset(0 - segment.length))
+              val newRight = right.drop(list.size).map(_.withIncrementOffset(0 - length))
              newLeft ++ newRight
            }
           else
