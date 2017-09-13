@@ -1,4 +1,4 @@
-package com.lrs.common.processor
+package com.lrs.streaming.processor
 
 import org.apache.spark.SparkContext
 

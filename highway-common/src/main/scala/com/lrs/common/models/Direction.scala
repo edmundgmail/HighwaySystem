@@ -6,7 +6,7 @@ package com.lrs.common.models
 class Direction(val dir: String, val segments: List[Segment], val rps: List[ReferencePoint]) {
 
   def removeSegment(start: SegmentPoint, end:SegmentPoint, removeRP:Boolean = true) : Direction = {
-      val segment
+      val segment= Segment(start, end, 0)
       val seg = segments.filter(_.contains(rps, segment))
       if(seg.isEmpty){
           throw new Exception("Can't find the segment to be removed")

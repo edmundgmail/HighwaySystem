@@ -192,7 +192,7 @@ class TestAddSegment extends Testing with Logging{
 
     val start = SegmentPoint("start", RP8.ID, 1.0)
     val end = SegmentPoint("end", RP5.ID, 1.0)
-    val direction4 = direction3.removeSegment(Segment(start, end, 6.7))
+    val direction4 = direction3.removeSegment(start, end)
 
     val TEST_DIRECTION1 = Direction.fromString(TEST_ROAD.name, direction_1.dir, List("1.3,RP1,2.0,RP2,2.5,RP3,3.6",
       "1.2,RP7,2.1,RP8,1.0", "1.3,RP6,2.7"))

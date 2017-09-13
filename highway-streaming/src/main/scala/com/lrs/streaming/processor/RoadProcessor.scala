@@ -1,4 +1,4 @@
-package com.lrs.common.processor
+package com.lrs.streaming.processor
 
 import com.lrs.common.models._
 import org.apache.spark.SparkContext
@@ -18,7 +18,7 @@ object RoadProcessor extends Processor[Road, DataRecord] {
         road
       }
       case r: AddSegmentRecord => {
-          road.
+          road
       }
 
       case _ => throw new Exception("can't recognize the action")

@@ -12,43 +12,37 @@ val meta = """META.INF(.)*""".r
 /**
   * Dependencies
   */
-val hadoopCommon          = "org.apache.hadoop"               %     "hadoop-common"                 %  "2.7.1"  // % "provided"
-val hadoopCommonNotProvided  = "org.apache.hadoop"            %     "hadoop-common"                 %  "2.7.1"
-val hadoopCommonTest      = "org.apache.hadoop"               %     "hadoop-common"                 %  "2.7.1"   % "test" classifier "tests"
-val hdfs                  = "org.apache.hadoop"               %     "hadoop-hdfs"                   %  "2.7.1"  // % "provided"
-val hdfsNotProvided       = "org.apache.hadoop"               %     "hadoop-hdfs"                   %  "2.7.1"
-val hdfsTest              = "org.apache.hadoop"               %     "hadoop-hdfs"                   %  "2.7.1"   % "test" classifier "tests"
-val hadoopMiniCluster     = "org.apache.hadoop"               %     "hadoop-minicluster"            %  "2.7.1"   % "test"
-val hbaseClient           = "org.apache.hbase"                %     "hbase-client"                  %  "1.1.2"
-val hbaseCommon           = "org.apache.hbase"                %     "hbase-common"                  %  "1.1.2"
-val hbaseCommonTest       = "org.apache.hbase"                %     "hbase-common"                  %  "1.1.2"   % "test" classifier "tests"
-val hbaseServer           = "org.apache.hbase"                %     "hbase-server"                  %  "1.1.2"   % "test"
-val hbaseServerTest       = "org.apache.hbase"                %     "hbase-server"                  %  "1.1.2"   % "test" classifier "tests"
-val hbaseHdpCompat        = "org.apache.hbase"                %     "hbase-hadoop-compat"           %  "1.1.2"   % "test"
-val hbaseHdpCompatTest    = "org.apache.hbase"                %     "hbase-hadoop-compat"           %  "1.1.2"   % "test" classifier "tests"
-val hbaseHdp2Compat       = "org.apache.hbase"                %     "hbase-hadoop2-compat"          %  "1.1.2"   % "test"
-val hbaseHdp2CompatTest   = "org.apache.hbase"                %     "hbase-hadoop2-compat"          %  "1.1.2"   % "test" classifier "tests"
+val akkaV = "2.4.7"
+
 val jacksonCore           = "com.fasterxml.jackson.core"      %     "jackson-core"                  %  "2.7.5"
 val jacksonDatabind       = "com.fasterxml.jackson.core"      %     "jackson-databind"              %  "2.7.5"
 val jacksonScala          = "com.fasterxml.jackson.module"    %%    "jackson-module-scala"          %  "2.7.5"
 val jodaTime              = "com.github.nscala-time"          %%    "nscala-time"                   %  "2.12.0"
 val log4j                 = "log4j"                           %     "log4j"                         %  "1.2.17"
 val mockito               = "org.mockito"                     %     "mockito-all"                   %  "1.10.19" % "test"
-val nifiSparkReceiver     = "org.apache.nifi"                 %     "nifi-spark-receiver"           %  "0.7.0"
 val scalaTest             = "org.scalatest"                   %%    "scalatest"                     %  "2.2.6"   % "test"
 val scalaMock             = "org.scalamock"                   %%    "scalamock-scalatest-support"   %  "3.2.2"   % "test"
 val sparkCore             = "org.apache.spark"                %%    "spark-core"                    %  "2.0.2"   //% "provided"
 val sparkStreaming        = "org.apache.spark"                %%    "spark-streaming"               %  "2.0.2"   //% "provided"
 val typesafeConfig        = "com.typesafe"                    %     "config"                        %  "1.3.0"
 val gson                  = "com.google.code.gson"            %     "gson"                          % "2.8.1"
-
+val akkaActor   		  = "com.typesafe.akka" 			  %% "akka-actor" 						% akkaV
+val akkaSlf4j   		  = "com.typesafe.akka"		   		  %% "akka-slf4j" 						% akkaV
+val akkaStream     		  = "com.typesafe.akka" 			  %% "akka-stream" 						% akkaV
+val akkaHttp    		  = "com.typesafe.akka" 			  %% "akka-http-experimental" 			% akkaV
+val akkaHttpJson   		  = "com.typesafe.akka" 			  %% "akka-http-spray-json-experimental" % akkaV
+val akkaHttpTest    	  = "com.typesafe.akka" 			  %% "akka-http-testkit" 				% akkaV
+val json4s 				  = "org.json4s" 					  %% "json4s-jackson" 					% "3.3.0"
+val logBack  			  = "ch.qos.logback" 				  % "logback-classic" 					% "1.1.7"
+val amazonAws 			  = "com.amazonaws" 				  % "aws-java-sdk-sqs" 					% "1.11.9"
+val mongoDB 			  = "org.mongodb.scala" 			  % "mongo-scala-driver_2.11" 		    % "2.1.0"
 
 /**
   * Shared settings for all the projects
   */
 lazy val commonSettings = Seq(
   version := s"0.0.1-SNAPSHOT${Try("_" + sys.env("BUILD_NUMBER")).getOrElse("")}",
-  organization := "com.ddp",
+  organization := "com.lrs",
   scalaVersion := "2.11.6",
   coverageMinimum := 80,
   coverageFailOnMinimum := false,
@@ -82,10 +76,8 @@ lazy val common = (project in file("highway-common")).
   settings(commonSettings: _*).
   settings(
     unmanagedBase := baseDirectory.value / "lib",
-    libraryDependencies ++= Seq(jacksonCore, jacksonDatabind, jacksonScala, jodaTime, typesafeConfig, log4j, sparkCore,
-      sparkStreaming, scalaTest, scalaMock, mockito, nifiSparkReceiver, hbaseClient, hbaseCommon, hbaseServer,
-      hbaseServerTest, hbaseCommonTest, hbaseHdpCompat, hbaseHdpCompatTest, hbaseHdp2Compat, hbaseHdp2CompatTest,
-      hadoopMiniCluster, hdfs, hdfsTest, hadoopCommon, hadoopCommonTest)
+    libraryDependencies ++= Seq(gson, jacksonCore, jacksonDatabind, jacksonScala, jodaTime, typesafeConfig, logBack,
+      scalaTest, scalaMock, mockito)
   )
 
 /**
@@ -95,13 +87,28 @@ lazy val streaming = (project in file("highway-streaming")).
   settings(commonSettings: _*).
   settings(
 
-    libraryDependencies ++= Seq(sparkCore, sparkStreaming, gson, scalaTest, scalaMock),
-    mainClass in Compile := Some("com.ddp.highway.Driver"),
-    mainClass in run := Some("com.ddp.highway.Driver"),
+    libraryDependencies ++= Seq(sparkCore, sparkStreaming, scalaTest, scalaMock),
+    mainClass in Compile := Some("com.lrs.streaming.Driver"),
+    mainClass in run := Some("com.lrs.streaming.Driver"),
     assemblyMergeStrategy in assembly := {
       case meta(_) => MergeStrategy.discard
       case x => MergeStrategy.first
     }
   ).dependsOn(common % "compile->compile;test->test")
 
-        
+
+/**
+  * Streaming project which is in charge of manageing the spark streaming
+  */
+lazy val rest = (project in file("highway-rest")).
+  settings(commonSettings: _*).
+  settings(
+
+    libraryDependencies ++= Seq( json4s,akkaActor, akkaHttp,akkaHttpTest, akkaHttpJson, akkaStream,akkaSlf4j, mongoDB, amazonAws, scalaTest, scalaMock),
+    mainClass in Compile := Some("com.lrs.rest.AkkaHttpScalaDockerSeed"),
+    mainClass in run := Some("com.lrs.rest.AkkaHttpScalaDockerSeed"),
+    assemblyMergeStrategy in assembly := {
+      case meta(_) => MergeStrategy.discard
+      case x => MergeStrategy.first
+    }
+  ).dependsOn(common % "compile->compile;test->test")

@@ -7,7 +7,7 @@ import com.google.gson.GsonBuilder
 import com.lrs.common.ConfigFields
 import com.lrs.common.logging.Logging
 import com.lrs.common.models.{DataRecord, DataRecordDeserializer, Road}
-import com.lrs.common.processor.RoadProcessor
+import com.lrs.streaming.processor.RoadProcessor
 import com.typesafe.config.{Config, ConfigFactory}
 import org.apache.spark.{SparkConf, SparkContext}
 
