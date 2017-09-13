@@ -12,7 +12,8 @@ val meta = """META.INF(.)*""".r
 /**
   * Dependencies
   */
-val akkaV = "2.4.7"
+val akkaV = "2.5.4"
+val akkaHttpV = "10.0.10"
 
 val jacksonCore           = "com.fasterxml.jackson.core"      %     "jackson-core"                  %  "2.7.5"
 val jacksonDatabind       = "com.fasterxml.jackson.core"      %     "jackson-databind"              %  "2.7.5"
@@ -29,9 +30,9 @@ val gson                  = "com.google.code.gson"            %     "gson"      
 val akkaActor   		  = "com.typesafe.akka" 			  %% "akka-actor" 						% akkaV
 val akkaSlf4j   		  = "com.typesafe.akka"		   		  %% "akka-slf4j" 						% akkaV
 val akkaStream     		  = "com.typesafe.akka" 			  %% "akka-stream" 						% akkaV
-val akkaHttp    		  = "com.typesafe.akka" 			  %% "akka-http-experimental" 			% akkaV
-val akkaHttpJson   		  = "com.typesafe.akka" 			  %% "akka-http-spray-json-experimental" % akkaV
-val akkaHttpTest    	  = "com.typesafe.akka" 			  %% "akka-http-testkit" 				% akkaV
+val akkaHttp    		  = "com.typesafe.akka" 			  %% "akka-http" 			% akkaHttpV
+val akkaHttpTest    	  = "com.typesafe.akka" 			  %% "akka-http-testkit" 				% akkaHttpV  % "test"
+val akkaHttpSprayJson    		  = "com.typesafe.akka" 			  %% "akka-http-spray-json" 			% akkaHttpV
 val json4s 				  = "org.json4s" 					  %% "json4s-jackson" 					% "3.3.0"
 val logBack  			  = "ch.qos.logback" 				  % "logback-classic" 					% "1.1.7"
 val amazonAws 			  = "com.amazonaws" 				  % "aws-java-sdk-sqs" 					% "1.11.9"
@@ -104,7 +105,7 @@ lazy val rest = (project in file("highway-rest")).
   settings(commonSettings: _*).
   settings(
 
-    libraryDependencies ++= Seq( json4s,akkaActor, akkaHttp,akkaHttpTest, akkaHttpJson, akkaStream,akkaSlf4j, mongoDB, amazonAws, scalaTest, scalaMock),
+    libraryDependencies ++= Seq( json4s,akkaActor, akkaHttp,akkaHttpTest, akkaHttpSprayJson, akkaStream,akkaSlf4j, mongoDB, amazonAws, scalaTest, scalaMock),
     mainClass in Compile := Some("com.lrs.rest.AkkaHttpScalaDockerSeed"),
     mainClass in run := Some("com.lrs.rest.AkkaHttpScalaDockerSeed"),
     assemblyMergeStrategy in assembly := {

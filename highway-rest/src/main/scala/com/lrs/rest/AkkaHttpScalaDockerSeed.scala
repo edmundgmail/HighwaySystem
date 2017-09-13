@@ -16,14 +16,10 @@ import com.typesafe.config.ConfigFactory
 object AkkaHttpScalaDockerSeed extends App {
 
   implicit val system = ActorSystem("main-actor-system")
-  implicit val materializer = ActorMaterializer(ActorMaterializerSettings(system))
+  implicit val materializer = ActorMaterializer()
   implicit val ec = system.dispatcher
 
   val conf = ConfigFactory.load()
-  val queueName = conf.getString("custom.queue.name")
-  val apiKey = conf.getString("custom.stocks.api-key")
-  val messageToSend = conf.getString("custom.messages.body")
-
   // actors
   //val queueConnector = system.actorOf(QueueConnector.props(queueName), "queue-connector")
   //val stockPriceConnector = system.actorOf(StockPriceConnector.props(apiKey), "stock-price-connector")
