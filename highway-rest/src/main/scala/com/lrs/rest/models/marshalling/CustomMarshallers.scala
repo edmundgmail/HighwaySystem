@@ -1,6 +1,7 @@
 package com.lrs.rest.models.marshalling
 
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
+import com.lrs.common.models.{AddRoadRecord, DirectionRecord, PointRecord, SegmentRecord}
 import com.lrs.rest.models.HighwayModel
 import spray.json.DefaultJsonProtocol
 
@@ -12,7 +13,9 @@ import spray.json.DefaultJsonProtocol
   * https://github.com/spray/spray-json
   */
 object CustomMarshallers extends SprayJsonSupport with DefaultJsonProtocol {
-
   implicit val highwayModelFormats  = jsonFormat2(HighwayModel)
-
+  implicit val pointRecordFormats = jsonFormat2(PointRecord)
+  implicit val segmentRecordFormats  = jsonFormat2(SegmentRecord)
+  implicit val directionRecordFormats = jsonFormat3(DirectionRecord)
+  implicit val addRoadRecordFormats =  jsonFormat18(AddRoadRecord)
 }

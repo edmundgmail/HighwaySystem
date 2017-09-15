@@ -7,9 +7,8 @@ import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server._
 import akka.stream.{ActorMaterializer, ActorMaterializerSettings}
-import com.lrs.rest.models.errors.ExternalResourceNotFoundException
-import com.lrs.rest.routes.actors.HighwayWorker
-import com.lrs.rest.routes.models.errors.ExternalResourceException
+import com.lrs.rest.actors.HighwayWorker
+import com.lrs.rest.models.errors.{ExternalResourceException, ExternalResourceNotFoundException}
 import com.lrs.rest.routes.{HighwayRoutes, MonitoringRoutes}
 import com.typesafe.config.ConfigFactory
 

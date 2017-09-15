@@ -1,3 +1,3 @@
-package com.lrs.rest.routes.models.errors
+package com.lrs.rest.models.errors
 
 case class ExternalResourceException(message:String)  extends Exception

@@ -12,7 +12,11 @@ case class SegmentRecord(start: PointRecord, end: PointRecord)
 
 case class DirectionRecord(dir: String, RPs: String, segments: Array[String])
 
-case class AddRoadRecord(override val action: String, override val dateTime: String, override val roadId: Long, val roadName:String, val mainDir: String, val directions: Array[DirectionRecord]) extends DataRecord(action, dateTime, roadId)
+case class AddRoadRecord(override val action: String, override val dateTime: String, override val roadId: Long,
+                         val roadName:String, val mainDir: String, val jurisDictionType:String, val ownerShip:String, val prefixCode:String,
+                         val routeNumber:String, val modifierCode:String, val mainlineCode:String, val routeTypeCode:String, val routeOfficialName:String,
+                         val routeFullName:String, val routeAlternateName:String, val beginPlace:String, val endPlace:String,
+                         val directions: Array[DirectionRecord]) extends DataRecord(action, dateTime, roadId)
 
 case class RemoveSegmentRecord(override val action: String, override val dateTime: String, override val roadId: Long, val dir:String, val startPoint: PointRecord, val endPoint:PointRecord) extends DataRecord(action, dateTime, roadId)
 
