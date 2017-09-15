@@ -4,6 +4,7 @@ project/target/*
 project/project/target/*
 highway-common/target/*
 highway-streaming/target/*
+highway-rest/target/*
 target/*
 .idea/*
 .idea/modules/*

@@ -4,6 +4,7 @@ import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
 import com.lrs.rest.models.HighwayModel
 import spray.json.DefaultJsonProtocol
 
+
 /***
   * Akka HTTP default Json Support is done using spray-json.
   *
