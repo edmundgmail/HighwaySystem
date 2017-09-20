@@ -4,12 +4,15 @@ import akka.actor.{Actor, ActorLogging, Props, Stash}
 import akka.pattern.pipe
 import com.lrs.common.models.AddRoadRecord
 import com.lrs.rest.actors.HighwayWorker.{AddHighway, GetHighway}
-import org.mongodb.scala.{Document, MongoClient}
-import org.mongodb.scala.model.Projections._
-
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
+import scala.concurrent.{ ExecutionContext, Future }
+
+import reactivemongo.api.{ DefaultDB, MongoConnection, MongoDriver }
+import reactivemongo.bson.{
+BSONDocumentWriter, BSONDocumentReader, Macros, document
+}
 
 
 /**
