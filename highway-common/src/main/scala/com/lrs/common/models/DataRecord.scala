@@ -6,11 +6,11 @@ package com.lrs.common.models
 class DataRecord(val action:String, val dateTime: String , val roadId: Long)
 
 
-case class PointRecord(rpName:String, offset:Double)
+case class PointRecord(override val action: String, override  val dateTime:String, override val roadId:Long, val rpName:String, val offset:Double) extends DataRecord(action, dateTime, roadId)
 
-case class SegmentRecord(start: PointRecord, end: PointRecord)
+case class SegmentRecord(val start: PointRecord, val end: PointRecord)
 
-case class DirectionRecord(dir: String, RPs: String, segments: Array[String])
+case class DirectionRecord(val dir: String, val RPs: String,val segments: Array[String])
 
 case class AddRoadRecord(override val action: String, override val dateTime: String, override val roadId: Long,
                          val roadName:String, val mainDir: String, val jurisDictionType:String, val ownerShip:String, val prefixCode:String,
