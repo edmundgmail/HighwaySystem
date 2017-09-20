@@ -25,11 +25,9 @@ class HighwayRoutes(highwayWorker: ActorRef)
           }
         } ~
         post{
-          entity(as[PointRecord]) {
-            //someObject => addHighway(someObject)
-            _=>
-            complete{
-              "Ok"
+          entity(as[AddRoadRecord]) {
+            o => {
+              complete(addHighway(o))
             }
           }
         }

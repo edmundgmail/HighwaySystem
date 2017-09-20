@@ -36,7 +36,9 @@ val akkaHttpSprayJson    		  = "com.typesafe.akka" 			  %% "akka-http-spray-json
 val json4s 				  = "org.json4s" 					  %% "json4s-jackson" 					% "3.3.0"
 val logBack  			  = "ch.qos.logback" 				  % "logback-classic" 					% "1.1.7"
 val amazonAws 			  = "com.amazonaws" 				  % "aws-java-sdk-sqs" 					% "1.11.9"
-val mongoDB 			  = "org.mongodb.scala" 			  % "mongo-scala-driver_2.11" 		    % "2.1.0"
+val mongoDB 			  = "org.reactivemongo" %% "reactivemongo" % "0.12" % "compile"
+
+
 
 /**
   * Shared settings for all the projects

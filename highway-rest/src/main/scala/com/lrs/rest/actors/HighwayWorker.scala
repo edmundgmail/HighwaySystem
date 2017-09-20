@@ -8,17 +8,7 @@ import org.mongodb.scala.{Document, MongoClient}
 import org.mongodb.scala.model.Projections._
 
 import scala.concurrent.ExecutionContext.Implicits.global
-
-
-import org.mongodb.scala._
-import org.mongodb.scala.bson.ObjectId
-import org.mongodb.scala.model.Filters._
-import org.mongodb.scala.model.Sorts._
-import org.mongodb.scala.model.Updates._
-
-import org.mongodb.scala.bson.codecs.Macros._
-import org.mongodb.scala.bson.codecs.DEFAULT_CODEC_REGISTRY
-import org.bson.codecs.configuration.CodecRegistries.{fromRegistries, fromProviders}
+import scala.concurrent.Future
 
 
 
@@ -43,13 +33,7 @@ object HighwayWorker {
 class HighwayWorker extends Actor with ActorLogging with Stash{
   implicit val system = context.system
 
-  val codecRegistry = fromRegistries(fromProviders(classOf[AddRoadRecord]), DEFAULT_CODEC_REGISTRY )
-
-
-  val mongoClient = MongoClient("mongodb://localhost")
-  val database = mongoClient.getDatabase("road").withCodecRegistry(codecRegistry)
-  val roadTable  = database.getCollection("Road")
-  val addRoadRecordTable : MongoCollection[AddRoadRecord] = database.getCollection("AddRoadRecordTable")
+  //val codecRegistry = fromRegistries(fromProviders(classOf[AddRoadRecord], classOf[DirectionRecord]), DEFAULT_CODEC_REGISTRY )
 
   def receive = {
 
@@ -61,11 +45,16 @@ class HighwayWorker extends Actor with ActorLogging with Stash{
   }
 
   private def addHighwayRecord(record: AddRoadRecord) = {
-    addRoadRecordTable.insertOne(record).toFuture()
+    Future{
+
+    }
   }
 
   private def getAllHighways = {
-    roadTable.find().projection(fields(include("roadName","roadId"), excludeId())).map(_.toJson).toFuture()
+    //roadTable.find().projection(fields(include("roadName","roadId"), excludeId())).map(_.toJson).toFuture()
+    Future{
+
+    }
   }
 
   private def getHighwayDetails() = {

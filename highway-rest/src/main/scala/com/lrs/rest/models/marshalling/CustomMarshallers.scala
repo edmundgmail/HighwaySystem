@@ -16,8 +16,8 @@ import spray.json.DefaultJsonProtocol
 
 object CustomMarshallers extends SprayJsonSupport with DefaultJsonProtocol {
   implicit val highwayModelFormats  = jsonFormat2(HighwayModel)
-  implicit val pointRecordFormats = jsonFormat5(PointRecord)
+  implicit val pointRecordFormats = jsonFormat2(PointRecord)
   implicit val segmentRecordFormats  = jsonFormat2(SegmentRecord)
-  implicit val directionRecordFormats = jsonFormat3(DirectionRecord)
-  //implicit val addRoadRecordFormats =  jsonFormat18(AddRoadRecord)
+  implicit val directionRecordFormats = jsonFormat2(DirectionRecord)
+  implicit val addRoadRecordFormats =  jsonFormat18(AddRoadRecord)
 }
