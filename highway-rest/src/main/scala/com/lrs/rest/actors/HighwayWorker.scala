@@ -4,14 +4,11 @@ import akka.actor.{Actor, ActorLogging, Props, Stash}
 import akka.pattern.pipe
 import com.lrs.common.models.AddRoadRecord
 import com.lrs.rest.actors.HighwayWorker.{AddHighway, GetHighway}
-import org.mongodb.scala.{Document, MongoClient}
-import org.mongodb.scala.model.Projections._
-
+import org.mongodb.scala.{Document, MongoClient, MongoCollection, MongoDatabase}
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
-
-
-
+import org.mongodb.scala.model.Projections._
+import spray.json._
+import com.lrs.rest.models.marshalling.CustomMarshallers._
 /**
   * Created by vagrant on 9/11/17.
   */
@@ -24,16 +21,14 @@ object HighwayWorker {
   case class GetHighwayDetails(name: String, id: String)
   case class AddHighway(record: AddRoadRecord)
 
-  // To directly connect to the default server localhost on port 27017
-
-  // Use a Connection String
-
+  val mongoClient: MongoClient = MongoClient("mongodb://localhost")
+  val database: MongoDatabase = mongoClient.getDatabase("road")
+  val collectionAddRoadRecord: MongoCollection[Document] = database.getCollection("AddRoadRecord");
 }
+
 
 class HighwayWorker extends Actor with ActorLogging with Stash{
   implicit val system = context.system
-
-  //val codecRegistry = fromRegistries(fromProviders(classOf[AddRoadRecord], classOf[DirectionRecord]), DEFAULT_CODEC_REGISTRY )
 
   def receive = {
 
@@ -45,16 +40,13 @@ class HighwayWorker extends Actor with ActorLogging with Stash{
   }
 
   private def addHighwayRecord(record: AddRoadRecord) = {
-    Future{
-
-    }
+     val json = record.toJson.toString()
+     val doc : Document = Document.apply(json)
+     HighwayWorker.collectionAddRoadRecord.insertOne(doc).toFuture
   }
 
   private def getAllHighways = {
-    //roadTable.find().projection(fields(include("roadName","roadId"), excludeId())).map(_.toJson).toFuture()
-    Future{
-
-    }
+    HighwayWorker.collectionAddRoadRecord.find().projection(fields(include("roadName","roadId"), excludeId())).map(_.toJson).toFuture()
   }
 
   private def getHighwayDetails() = {
