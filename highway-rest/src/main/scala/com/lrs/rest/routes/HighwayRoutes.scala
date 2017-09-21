@@ -5,9 +5,11 @@ import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import akka.pattern.ask
 import akka.util.Timeout
-import com.lrs.common.models.{AddRoadRecord, PointRecord}
+import com.lrs.common.models.{AddRoadRecord, DataRecord, PointRecord}
 import com.lrs.rest.actors.HighwayWorker
 import com.lrs.rest.models.marshalling.CustomMarshallers._
+import spray.json.{JsObject, JsValue}
+
 import scala.concurrent.ExecutionContextExecutor
 import scala.concurrent.duration._
 
@@ -25,7 +27,7 @@ class HighwayRoutes(highwayWorker: ActorRef)
           }
         } ~
         post{
-          entity(as[AddRoadRecord]) {
+          entity(as[JsObject]) {
             o => {
               complete(addHighway(o))
             }
@@ -40,7 +42,7 @@ class HighwayRoutes(highwayWorker: ActorRef)
     result
   }
 
-  private def addHighway(record: AddRoadRecord) = {
+  private def addHighway(record: JsObject) = {
     val result = (highwayWorker ? HighwayWorker.AddHighway(record)).map(_.toString)
     result
   }
