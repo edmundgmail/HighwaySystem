@@ -79,7 +79,7 @@ lazy val common = (project in file("highway-common")).
   settings(commonSettings: _*).
   settings(
     unmanagedBase := baseDirectory.value / "lib",
-    libraryDependencies ++= Seq(gson, jacksonCore, jacksonDatabind, jacksonScala, jodaTime, typesafeConfig, logBack,
+    libraryDependencies ++= Seq(json4s,gson,  akkaHttpSprayJson, mongoDB,jacksonCore, jacksonDatabind, jacksonScala, jodaTime, typesafeConfig, logBack,
       scalaTest, scalaMock, mockito)
   )
 
@@ -107,7 +107,7 @@ lazy val streaming = (project in file("highway-streaming")).
 lazy val rest = (project in file("highway-rest")).
   settings(commonSettings: _*).
   settings(
-    libraryDependencies ++= Seq( json4s,akkaActor, akkaHttp,akkaHttpTest, akkaHttpSprayJson, akkaStream,akkaSlf4j, mongoDB, amazonAws, scalaTest, scalaMock),
+    libraryDependencies ++= Seq( json4s, akkaActor, akkaHttp,akkaHttpTest, akkaHttpSprayJson, akkaStream,akkaSlf4j, amazonAws, scalaTest, scalaMock),
     mainClass in Compile := Some("com.lrs.rest.AkkaHttpScalaDockerSeed"),
     mainClass in run := Some("com.lrs.rest.AkkaHttpScalaDockerSeed")
   ).dependsOn(common % "compile->compile;test->test")

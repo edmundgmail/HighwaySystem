@@ -3,11 +3,10 @@ package com.lrs.rest.actors
 import akka.actor.{Actor, ActorLogging, Props, Stash}
 import akka.pattern.pipe
 import com.lrs.common.models.{AddRoadRecord, DataRecord}
+import com.lrs.common.utils.MongoUtils
 import com.lrs.rest.actors.HighwayWorker.{AddHighway, GetHighway}
-import org.mongodb.scala.{Document, MongoClient, MongoCollection, MongoDatabase}
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import org.mongodb.scala.model.Projections._
 import spray.json._
 import com.lrs.rest.models.marshalling.CustomMarshallers._
 
@@ -27,29 +26,18 @@ object HighwayWorker {
 
 class HighwayWorker extends Actor with ActorLogging with Stash{
 
-  val mongoClient: MongoClient = MongoClient("mongodb://localhost")
-  val database: MongoDatabase = mongoClient.getDatabase("road")
-  val collectionAddRoadRecord: MongoCollection[Document] = database.getCollection("AddRoadRecord")
 
   implicit val system = context.system
 
   def receive = {
 
     case GetHighway =>
-      getAllHighways pipeTo sender()
+      MongoUtils.getAllHighways pipeTo sender()
 
     case AddHighway(r) =>
-      addHighwayRecord(r) pipeTo sender()
+      MongoUtils.addHighwayRecord(r) pipeTo sender()
   }
 
-  private def addHighwayRecord(record: JsObject) = {
-     val doc : Document = Document.apply(record.toString)
-     collectionAddRoadRecord.insertOne(doc).toFuture
-  }
-
-  private def getAllHighways = {
-    collectionAddRoadRecord.find().projection(fields(include("roadName","roadId"), excludeId())).map(_.toJson).toFuture()
-  }
 
   private def getHighwayDetails() = {
 
