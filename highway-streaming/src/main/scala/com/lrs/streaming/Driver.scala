@@ -2,16 +2,19 @@ package com.lrs.streaming
 
 import java.io.File
 import java.nio.file.{Files, Paths}
+import java.util.concurrent.Executors
 
 import com.google.gson.GsonBuilder
 import com.lrs.common.ConfigFields
 import com.lrs.common.logging.Logging
 import com.lrs.common.models.{DataRecord, DataRecordDeserializer, Road}
+import com.lrs.common.utils.MongoUtils
 import com.lrs.streaming.processor.RoadProcessor
 import com.typesafe.config.{Config, ConfigFactory}
 import org.apache.spark.{SparkConf, SparkContext}
 
 import scala.collection.JavaConverters._
+import scala.concurrent.ExecutionContext
 import scala.util.Try
 
 /**
@@ -49,12 +52,24 @@ object Driver extends Logging{
     // parse json string to object
     val records = gson.fromJson(fileData, classOf[Array[DataRecord]])
 
+    implicit val ec = ExecutionContext.fromExecutor(null)
 
-   var road : Road = null
-    for(record<-records){
-      road = RoadProcessor.process(sc, road, record)
+    val records1 = MongoUtils.getHighwayRecords(1)
+
+    records1 onSuccess {
+      case rs => {
+        var road : Road = null
+        val rss = rs.map(r=>gson.fromJson(r.toString, classOf[DataRecord]))
+        for(record<-rss){
+          road = RoadProcessor.process(sc, road, record)
+        }
+        logger.info(road.toString)
+      }
     }
 
-    logger.info(road.toString)
+    records1 onFailure {
+      case t=>
+        logger.info("" + t.getMessage)
+    }
   }
 }
