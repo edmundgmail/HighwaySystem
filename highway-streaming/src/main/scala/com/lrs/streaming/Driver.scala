@@ -12,11 +12,18 @@ import com.lrs.common.utils.MongoUtils
 import com.lrs.streaming.processor.RoadProcessor
 import com.typesafe.config.{Config, ConfigFactory}
 import org.apache.spark.{SparkConf, SparkContext}
+import org.mongodb.scala.Document
+import org.mongodb.scala.bson.BsonDocument
+import org.scalatest.time
+import org.scalatest.time.Seconds
 
 import scala.collection.JavaConverters._
-import scala.concurrent.ExecutionContext
-import scala.util.Try
-
+import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, ExecutionContext}
+import scala.util.{Failure, Success, Try}
+import scala.concurrent.{Await, Future}
+import scala.concurrent.duration._
+import scala.concurrent.ExecutionContext.Implicits.global
 /**
   * Created by vagrant on 6/21/17.
   */
@@ -42,34 +49,27 @@ object Driver extends Logging{
 
     // Get the application configuration
     // read JSON file data as String
-    val filePath = config.getString(ConfigFields.STAGING_DIR)
-    val fileData = new String(Files.readAllBytes(Paths.get(filePath)))
+    //val filePath = config.getString(ConfigFields.STAGING_DIR)
+    //val fileData = new String(Files.readAllBytes(Paths.get(filePath)))
 
     val gsonBuilder = new GsonBuilder
     gsonBuilder.registerTypeAdapter(classOf[DataRecord], DataRecordDeserializer.getInstance)
 
     val gson = gsonBuilder.create()
-    // parse json string to object
-    val records = gson.fromJson(fileData, classOf[Array[DataRecord]])
+    val records = MongoUtils.getHighwayRecords(1)
 
-    implicit val ec = ExecutionContext.fromExecutor(null)
-
-    val records1 = MongoUtils.getHighwayRecords(1)
-
-    records1 onSuccess {
-      case rs => {
-        var road : Road = null
-        val rss = rs.map(r=>gson.fromJson(r.toString, classOf[DataRecord]))
-        for(record<-rss){
-          road = RoadProcessor.process(sc, road, record)
-        }
+    records.onComplete({
+      case Success(rs : Seq[Document]) => {
+        logger.info(rs.map(_.toJson).mkString(","))
+        val road = rs.toList.map(r => gson.fromJson(r.toJson, classOf[DataRecord])).foldLeft[Road](null)( (road, r)=> RoadProcessor.process(sc, road, r))
         logger.info(road.toString)
       }
-    }
+      case Failure(e) => {
+        println(e.getMessage)
+        e.printStackTrace
+      }
+    })
 
-    records1 onFailure {
-      case t=>
-        logger.info("" + t.getMessage)
-    }
+    Await.ready(records, 60 seconds)
   }
 }

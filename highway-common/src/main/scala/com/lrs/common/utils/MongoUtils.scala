@@ -23,8 +23,8 @@ object  MongoUtils {
   }
 
 
-  def getHighwayRecords(roadID : Integer)(implicit ec: ExecutionContext) = {
-    collectionRoadRecord.find().toFuture()
+  def getHighwayRecords(roadId : Integer)(implicit ec: ExecutionContext) = {
+    collectionRoadRecord.find(equal("roadId", roadId.toString)).toFuture()
       //.sort(exists("dateTime")).sort(descending("dateTime")).toFuture
 
   }
