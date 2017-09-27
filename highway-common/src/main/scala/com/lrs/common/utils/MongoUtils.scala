@@ -24,7 +24,7 @@ object  MongoUtils {
 
 
   def getHighwayRecords(roadId : Integer)(implicit ec: ExecutionContext) = {
-    collectionRoadRecord.find(equal("roadId", roadId.toString)).toFuture()
+    collectionRoadRecord.find(equal("roadId", roadId)).toFuture()
       //.sort(exists("dateTime")).sort(descending("dateTime")).toFuture
 
   }
