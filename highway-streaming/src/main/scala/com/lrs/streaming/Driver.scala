@@ -10,6 +10,7 @@ import com.lrs.common.logging.Logging
 import com.lrs.common.models.{DataRecord, DataRecordDeserializer, Road}
 import com.lrs.common.utils.MongoUtils
 import com.lrs.streaming.processor.RoadProcessor
+import com.mongodb.async.client.{MongoIterable, Observer, Subscription}
 import com.typesafe.config.{Config, ConfigFactory}
 import org.apache.spark.{SparkConf, SparkContext}
 import org.mongodb.scala.Document
@@ -79,5 +80,12 @@ object Driver extends Logging{
     }
 
     Await.ready(result, Duration.Inf)
+    val cursor = MongoUtils.collectionRoadRecord.find().subscribe(
+      doc=> {
+        println(doc.toString)
+      }
+    )
+
+    Thread.sleep(1000000)
   }
 }
