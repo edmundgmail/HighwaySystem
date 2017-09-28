@@ -58,18 +58,26 @@ object Driver extends Logging{
     val gson = gsonBuilder.create()
     val records = MongoUtils.getHighwayRecords(1)
 
-    records.onComplete({
+    val result = records andThen {
       case Success(rs : Seq[Document]) => {
-        logger.info(rs.map(_.toJson).mkString(","))
-        val road = rs.toList.map(r => gson.fromJson(r.toJson, classOf[DataRecord])).foldLeft[Road](null)( (road, r)=> RoadProcessor.process(sc, road, r))
-        logger.info(road.toString)
+        val rss = rs.toList.map(r => gson.fromJson(r.toJson, classOf[DataRecord]))
+        rss.foreach(r=>logger.info(gson.toJson(r)))
+        val road= rss.foldLeft[Road](null)( (road, r)=> RoadProcessor.process(sc, road, r))
+        val r = MongoUtils.addRoad(road)
+        val ret = r andThen {
+          case Success(_) => println("success")
+          case Failure(e) => {
+            println(e.getMessage)
+            e.printStackTrace
+          }
+         }
       }
       case Failure(e) => {
         println(e.getMessage)
         e.printStackTrace
       }
-    })
+    }
 
-    Await.ready(records, 60 seconds)
+    Await.ready(result, Duration.Inf)
   }
 }
