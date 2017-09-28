@@ -80,7 +80,7 @@ object Driver extends Logging{
     }
 
     Await.ready(result, Duration.Inf)
-    val cursor = MongoUtils.collectionRoadRecord.find().subscribe(
+    val cursor = MongoUtils.collectionRoadRecord.find().wrapped.
       doc=> {
         println(doc.toString)
       }
