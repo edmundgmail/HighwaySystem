@@ -37,7 +37,7 @@ object OplogService {
         .find(and(
           in("op", "i", "d", "u"),
           exists("fromMigrate", exists = false)))
-        .cursorType(CursorType.TailableAwait)
+      .cursorType(CursorType.TailableAwait)
         .noCursorTimeout(true)
     }
   }
