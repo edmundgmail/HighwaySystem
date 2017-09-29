@@ -4,11 +4,13 @@ import java.io.File
 import java.nio.file.{Files, Paths}
 import java.util.concurrent.Executors
 
+import akka.actor.ActorSystem
+import akka.stream.ActorMaterializer
 import com.google.gson.GsonBuilder
 import com.lrs.common.ConfigFields
 import com.lrs.common.logging.Logging
 import com.lrs.common.models.{DataRecord, DataRecordDeserializer, Road}
-import com.lrs.common.utils.MongoUtils
+import com.lrs.common.utils.{MongoUtils, OplogModel, OplogService}
 import com.lrs.streaming.processor.RoadProcessor
 import com.mongodb.async.client.{MongoIterable, Observer, Subscription}
 import com.typesafe.config.{Config, ConfigFactory}
@@ -80,11 +82,12 @@ object Driver extends Logging{
     }
 
     Await.ready(result, Duration.Inf)
-    val cursor = MongoUtils.collectionRoadRecord.find().wrapped.
-      doc=> {
-        println(doc.toString)
-      }
-    )
+
+    implicit val system = ActorSystem("main-actor-system")
+    implicit val materializer = ActorMaterializer()
+
+    val oplogService = OplogService()
+    oplogService.source(MongoUtils.mongoClient).map(OplogModel.documentToOplogEntry).runForeach(println)
 
     Thread.sleep(1000000)
   }

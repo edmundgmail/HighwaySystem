@@ -10,6 +10,7 @@ import scala.concurrent.ExecutionContext
 import org.mongodb.scala.bson.codecs.Macros._
 import org.mongodb.scala.bson.codecs.DEFAULT_CODEC_REGISTRY
 import org.bson.codecs.configuration.CodecRegistries.{fromProviders, fromRegistries}
+
 /**
   * Created by eguo on 9/21/17.
   */
