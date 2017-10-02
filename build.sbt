@@ -36,7 +36,9 @@ val akkaHttpSprayJson    		  = "com.typesafe.akka" 			  %% "akka-http-spray-json
 val json4s 				  = "org.json4s" 					  %% "json4s-jackson" 					% "3.3.0"
 val logBack  			  = "ch.qos.logback" 				  % "logback-classic" 					% "1.1.7"
 val amazonAws 			  = "com.amazonaws" 				  % "aws-java-sdk-sqs" 					% "1.11.9"
+val mongoDBJava = "org.mongodb" % "mongodb-driver-async" % "3.5.0" % "compile"
 val mongoDB = "org.mongodb.scala" % "mongo-scala-driver_2.11" % "2.1.0" % "compile"
+val rxJava = "io.reactivex" % "rxjava" % "1.0.2" % "compile"
 
 
 
@@ -90,7 +92,7 @@ lazy val streaming = (project in file("highway-streaming")).
   settings(commonSettings: _*).
   settings(
 
-    libraryDependencies ++= Seq(sparkCore, sparkStreaming, scalaTest, scalaMock),
+    libraryDependencies ++= Seq(sparkCore, sparkStreaming, scalaTest, scalaMock,mongoDBJava, rxJava),
     mainClass in Compile := Some("com.lrs.streaming.Driver"),
     mainClass in run := Some("com.lrs.streaming.Driver"),
     assemblyMergeStrategy in assembly := {
