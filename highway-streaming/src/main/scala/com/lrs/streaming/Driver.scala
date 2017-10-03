@@ -1,31 +1,22 @@
 package com.lrs.streaming
 
 import java.io.File
-import java.nio.file.{Files, Paths}
-import java.util.concurrent.Executors
 
-import akka.actor.ActorSystem
-import akka.stream.ActorMaterializer
 import com.google.gson.GsonBuilder
 import com.lrs.common.ConfigFields
 import com.lrs.common.logging.Logging
 import com.lrs.common.models.{DataRecord, DataRecordDeserializer, Road}
-import com.lrs.common.utils.{MongoUtils, OplogModel, OplogService}
+import com.lrs.common.utils.{MongoUtils}
 import com.lrs.streaming.processor.RoadProcessor
-import com.mongodb.async.client.{MongoIterable, Observer, Subscription}
+import com.lrs.streaming.utils.MongoMonitor
 import com.typesafe.config.{Config, ConfigFactory}
 import org.apache.spark.{SparkConf, SparkContext}
 import org.mongodb.scala.Document
-import org.mongodb.scala.bson.BsonDocument
-import org.scalatest.time
-import org.scalatest.time.Seconds
 
 import scala.collection.JavaConverters._
 import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, ExecutionContext}
 import scala.util.{Failure, Success, Try}
 import scala.concurrent.{Await, Future}
-import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.Implicits.global
 /**
   * Created by vagrant on 6/21/17.
@@ -83,12 +74,20 @@ object Driver extends Logging{
 
     Await.ready(result, Duration.Inf)
 
+      val monitor = new MongoMonitor()
+      monitor.run
+
+
+
+
+
+    /*
     implicit val system = ActorSystem("main-actor-system")
     implicit val materializer = ActorMaterializer()
 
     val oplogService = OplogService()
     oplogService.source(MongoUtils.mongoClient).map(OplogModel.documentToOplogEntry).runForeach(println)
+  */
 
-    Thread.sleep(1000000)
   }
 }

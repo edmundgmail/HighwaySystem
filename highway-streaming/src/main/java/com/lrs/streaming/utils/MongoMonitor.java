@@ -12,9 +12,9 @@ import java.util.concurrent.CountDownLatch;
 /**
  * Created by vagrant on 10/2/17.
  */
-public class MongoMonitor extends Runnable {
+public class MongoMonitor implements Runnable {
     @Override
-    public void run() {
+    public void run()  {
         CountDownLatch latch = new CountDownLatch(1);
 
         MongoDatabase db = MongoClients.create().getDatabase("road");
@@ -31,7 +31,12 @@ public class MongoMonitor extends Runnable {
                         })
         ).subscribe(System.out::println, Throwable::printStackTrace, latch::countDown);
 
-        latch.await();
+        try{
+            latch.await();
+        }
+        catch (InterruptedException e){
+            e.printStackTrace();
+        }
         System.out.println("Completed");
     }
 }
