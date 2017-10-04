@@ -56,7 +56,7 @@ object Driver extends Logging{
       case Success(rs : Seq[Document]) => {
         val rss = rs.toList.map(r => gson.fromJson(r.toJson, classOf[DataRecord]))
         rss.foreach(r=>logger.info(gson.toJson(r)))
-        val road= rss.foldLeft[Road](null)( (road, r)=> RoadProcessor.process(sc, road, r))
+        val road= rss.foldLeft[Road](null)( (road, r)=> RoadProcessor.process(road, r))
         val r = MongoUtils.addRoad(road)
         val ret = r andThen {
           case Success(_) => println("success")

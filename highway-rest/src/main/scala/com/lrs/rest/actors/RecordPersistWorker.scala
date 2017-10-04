@@ -4,7 +4,7 @@ import akka.actor.{Actor, ActorLogging, Props, Stash}
 import akka.pattern.pipe
 import com.lrs.common.models.{AddRoadRecord, DataRecord}
 import com.lrs.common.utils.MongoUtils
-import com.lrs.rest.actors.HighwayWorker.{AddHighway, GetHighway}
+import com.lrs.rest.actors.RecordPersistWorker.{AddHighway, GetHighway}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import spray.json._
@@ -14,9 +14,9 @@ import com.lrs.rest.models.marshalling.CustomMarshallers._
   * Created by vagrant on 9/11/17.
   */
 
-object HighwayWorker {
+object RecordPersistWorker {
 
-  def props(): Props = Props(new HighwayWorker)
+  def props(): Props = Props(new RecordPersistWorker)
 
   case class GetHighway()
   case class GetHighwayDetails(name: String, id: String)
@@ -24,7 +24,7 @@ object HighwayWorker {
 }
 
 
-class HighwayWorker extends Actor with ActorLogging with Stash{
+class RecordPersistWorker extends Actor with ActorLogging with Stash{
 
 
   implicit val system = context.system

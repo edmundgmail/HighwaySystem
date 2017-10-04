@@ -7,5 +7,5 @@ import org.apache.spark.SparkContext
   */
 trait Processor[T, R] {
 
-  def process(sc: SparkContext, t: T, r : R) : T
+  def process(t: T, r : R) : T
 }

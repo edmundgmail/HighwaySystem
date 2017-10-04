@@ -41,6 +41,10 @@ object  MongoUtils {
     collectionRoadTable.find(equal("roadId", roadId)).toFuture()
   }
 
+  def updateRoad(road: Road) = {
+    collectionRoadTable.findOneAndReplace(equal("roadId", road.roadId), road).toFuture
+  }
+
   def getAllHighways = {
     collectionRoadRecordTable.find().projection(fields(include("roadName","roadId"), excludeId())).map(_.toJson).toFuture
   }

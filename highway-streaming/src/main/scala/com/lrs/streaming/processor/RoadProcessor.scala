@@ -8,7 +8,7 @@ import org.apache.spark.SparkContext
   */
 object RoadProcessor extends Processor[Road, DataRecord] {
 
-    override def process(sc: SparkContext, road: Road, dataRecord: DataRecord): Road = {
+    override def process(road: Road, dataRecord: DataRecord): Road = {
     dataRecord match {
       case r: AddRoadRecord => {
         Road.fromJson(r)
