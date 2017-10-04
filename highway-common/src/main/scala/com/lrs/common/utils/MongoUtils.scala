@@ -18,17 +18,17 @@ object  MongoUtils {
   val codecRegistry = fromRegistries(fromProviders(classOf[Road], classOf[Direction], classOf[Segment], classOf[SegmentPoint], classOf[ReferencePoint]), DEFAULT_CODEC_REGISTRY )
   val mongoClient: MongoClient = MongoClient("mongodb://localhost")
   val database: MongoDatabase = mongoClient.getDatabase("road").withCodecRegistry(codecRegistry)
-  val collectionRoadRecord: MongoCollection[Document] = database.getCollection("RoadRecordTable")
+  val collectionRoadRecordTable: MongoCollection[Document] = database.getCollection("RoadRecordTable")
   val collectionRoadTable: MongoCollection[Road] = database.getCollection("RoadTable")
 
   def addHighwayRecord(record: JsObject) = {
     val doc : Document = Document.apply(record.toString)
-    collectionRoadRecord.insertOne(doc).toFuture
+    collectionRoadRecordTable.insertOne(doc).toFuture
   }
 
 
-  def getHighwayRecords(roadId : Integer)(implicit ec: ExecutionContext) = {
-    collectionRoadRecord.find(equal("roadId", roadId)).toFuture()
+  def getHighwayRecords(roadId : Long)(implicit ec: ExecutionContext) = {
+    collectionRoadRecordTable.find(equal("roadId", roadId)).toFuture()
       //.sort(exists("dateTime")).sort(descending("dateTime")).toFuture
 
   }
@@ -37,8 +37,12 @@ object  MongoUtils {
     collectionRoadTable.insertOne(road).toFuture
   }
 
+  def getRoad(roadId: Long) = {
+    collectionRoadTable.find(equal("roadId", roadId)).toFuture()
+  }
+
   def getAllHighways = {
-    collectionRoadRecord.find().projection(fields(include("roadName","roadId"), excludeId())).map(_.toJson).toFuture
+    collectionRoadRecordTable.find().projection(fields(include("roadName","roadId"), excludeId())).map(_.toJson).toFuture
   }
 
 }

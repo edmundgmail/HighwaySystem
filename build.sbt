@@ -92,7 +92,7 @@ lazy val streaming = (project in file("highway-streaming")).
   settings(commonSettings: _*).
   settings(
 
-    libraryDependencies ++= Seq(sparkCore, sparkStreaming, scalaTest, scalaMock,mongoDBJava, rxJava),
+    libraryDependencies ++= Seq(sparkCore, sparkStreaming, scalaTest, akkaStream, scalaMock,mongoDBJava, rxJava),
     mainClass in Compile := Some("com.lrs.streaming.Driver"),
     mainClass in run := Some("com.lrs.streaming.Driver"),
     assemblyMergeStrategy in assembly := {

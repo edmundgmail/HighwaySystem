@@ -8,7 +8,7 @@ import com.lrs.common.utils.Testing
   */
 class TestAddSegment extends Testing with Logging{
 
-  val TEST_ROAD = Road("Test", "E", null)
+  val TEST_ROAD = Road("Test", 1, "E", null)
 
   val direction_1 = Direction("E", null, null)
   //direction_1.addSegment( segment_1,   )

@@ -18,7 +18,7 @@ public class MongoMonitor implements Runnable {
         CountDownLatch latch = new CountDownLatch(1);
 
         MongoDatabase db = MongoClients.create().getDatabase("road");
-        MongoCollection<Document> collection = db.getCollection("RoadTable");
+        MongoCollection<Document> collection = db.getCollection("RoadRecordTable");
         Observable.create(subscriber ->
                 collection.find()
                         .cursorType(CursorType.TailableAwait)
