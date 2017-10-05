@@ -7,7 +7,7 @@ import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server._
 import akka.stream.{ActorMaterializer, ActorMaterializerSettings}
-import com.lrs.rest.actors.RecordPersistWorker
+import com.lrs.rest.actors.{RecordParseWorker, RecordPersistWorker}
 import com.lrs.rest.models.errors.{ExternalResourceException, ExternalResourceNotFoundException}
 import com.lrs.rest.routes.{HighwayRoutes, MonitoringRoutes}
 import com.typesafe.config.ConfigFactory
@@ -27,8 +27,9 @@ object AkkaHttpScalaDockerSeed extends App {
   // route definitions
   //val queueRoutes = new QueueRoutes(queueConnector, stockPriceConnector)
   val recordPersistWorker = system.actorOf(RecordPersistWorker.props)
+  val recordParseWorker = system.actorOf(RecordParseWorker.props)
 
-  val highwayRoutes = new HighwayRoutes(recordPersistWorker)
+  val highwayRoutes = new HighwayRoutes(recordPersistWorker, recordParseWorker)
   val monitoringRoutes = new MonitoringRoutes()
   // implicit exception handler - this will be picked up by the route definitions
   implicit def myExceptionHandler: ExceptionHandler = customGlobalErrorHandler

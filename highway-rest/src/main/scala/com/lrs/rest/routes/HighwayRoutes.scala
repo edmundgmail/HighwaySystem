@@ -6,14 +6,14 @@ import akka.http.scaladsl.server.Route
 import akka.pattern.ask
 import akka.util.Timeout
 import com.lrs.common.models.{AddRoadRecord, DataRecord, PointRecord}
-import com.lrs.rest.actors.RecordPersistWorker
+import com.lrs.rest.actors.{RecordParseWorker, RecordPersistWorker}
 import com.lrs.rest.models.marshalling.CustomMarshallers._
 import spray.json.{JsObject, JsValue}
 
 import scala.concurrent.ExecutionContextExecutor
 import scala.concurrent.duration._
 
-class HighwayRoutes(highwayWorker: ActorRef)
+class HighwayRoutes(recordPersistWorker: ActorRef, recordParseWorker: ActorRef)
                    (implicit ec: ExecutionContextExecutor) {
 
   implicit val timeout = Timeout(10.seconds)
@@ -28,7 +28,7 @@ class HighwayRoutes(highwayWorker: ActorRef)
         post{
           entity(as[JsObject]) {
             o => {
-              complete(addHighway(o))
+              handleHighwayRecord(o)
             }
           }
         }
@@ -37,13 +37,14 @@ class HighwayRoutes(highwayWorker: ActorRef)
 
 
   private def listHighways = {
-    val result = (highwayWorker? RecordPersistWorker.GetHighway).map(_.toString)
+    val result = (recordPersistWorker? RecordPersistWorker.GetHighway).map(_.toString)
     result
   }
 
-  private def addHighway(record: JsObject) = {
-    val result = (highwayWorker ? RecordPersistWorker.AddHighway(record)).map(_.toString)
-    result
+  private def handleHighwayRecord(record: JsObject) = {
+    recordPersistWorker ! RecordPersistWorker.AddHighway(record)
+    recordParseWorker ! record
+    complete("success")
   }
 
  }

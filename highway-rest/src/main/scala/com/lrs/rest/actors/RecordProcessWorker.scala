@@ -30,10 +30,7 @@ class RecordProcessWorker extends Actor with ActorLogging with Stash{
           val newRoad = rs(0).removeSegment(record.dir, record.startPoint, record.endPoint)
           MongoUtils.updateRoad(newRoad)
         }
-        case Failure(e) => {
-          println(e.getMessage)
-          e.printStackTrace
-        }
+        case Failure(e) => throw e
       }
     }
     case record: AddSegmentRecord => {
@@ -43,13 +40,10 @@ class RecordProcessWorker extends Actor with ActorLogging with Stash{
         val newRoad = rs(0).addSegment(record.dir, record.segment, record.afterRP, record.leftConnect, record.beforeRP, record.rightConnect)
         MongoUtils.updateRoad(newRoad)
       }
-        case Failure(e) => {
-        println(e.getMessage)
-        e.printStackTrace
-      }
+        case Failure(e) => throw e
       }
     }
 
-    case _ =>
+    case _ => throw new Exception("unknown record type")
   }
 }
