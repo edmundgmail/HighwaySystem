@@ -1,9 +1,11 @@
 package com.lrs.common.models
 
+import com.lrs.common.utils.{JsonReadable, JsonWritable}
+
 /**
   * Created by eguo on 8/26/17.
   */
-class Road(val name:String, val roadId: Long, val mainDir: String, val directions: List[Direction]) {
+class Road(val name:String, val roadId: Long, val mainDir: String, val directions: List[Direction]) extends JsonWritable{
   def withUpdatedDirections(newDirections:List[Direction]) = new Road(name , roadId, mainDir, newDirections)
 
   override def toString: String = {

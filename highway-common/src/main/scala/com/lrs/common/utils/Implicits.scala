@@ -5,12 +5,16 @@ package com.lrs.common.utils
   */
 import java.util.concurrent.atomic.AtomicBoolean
 
+import com.lrs.common.models.{Road}
 import org.mongodb.{scala => mongoDB}
+import org.mongodb.scala.Document
 import org.{reactivestreams => rxStreams}
 
 import scala.language.implicitConversions
 
 object Implicits {
+  implicit def roadToDocument(road:Road) : Document =  Document.apply(road.toJson)
+  implicit  def docToRoad(doc: Document) : Road = JsonReadable.parseJson(doc.toJson, classOf[Road])
 
   implicit def observableToPublisher[T](observable: mongoDB.Observable[T]): rxStreams.Publisher[T] = ObservableToPublisher(observable)
 
