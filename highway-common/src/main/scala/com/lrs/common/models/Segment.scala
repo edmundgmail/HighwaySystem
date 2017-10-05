@@ -1,5 +1,6 @@
 package com.lrs.common.models
 
+import com.lrs.common.utils.AssertException
 import com.lrs.common.utils.MyImplicits._
 /**
   * Created by eguo on 8/26/17.
@@ -12,7 +13,7 @@ class Segment(val start: SegmentPoint, val end : SegmentPoint, val length:Double
     val thisEnd = ReferencePoint.getByID(end.referencePoint, rps)
     val thatStart = ReferencePoint.getByID(seg.start.referencePoint, rps)
     val thatEnd = ReferencePoint.getByID(seg.end.referencePoint, rps)
-    assert(thisStart.isDefined && thisEnd.isDefined && thatStart.isDefined && thatEnd.isDefined)
+    AssertException(thisStart.isDefined && thisEnd.isDefined && thatStart.isDefined && thatEnd.isDefined)
     return thisStart.get.globalOffset+start.offset <= thatStart.get.globalOffset+seg.start.offset &&
           thisEnd.get.globalOffset + end.offset >= thatEnd.get.globalOffset+seg.end.offset
   }

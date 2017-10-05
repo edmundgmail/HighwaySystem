@@ -27,15 +27,14 @@ class RecordProcessWorker extends Actor with ActorLogging with Stash{
       val result = road andThen {
         case Success(rs : Seq[Road])  =>  {
           val oldRoad : Road = rs(0)
-          try{
             val newRoad = oldRoad.removeSegment(record.dir, record.startPoint, record.endPoint)
             MongoUtils.updateRoad(newRoad)
-          }
-          catch {
-            case e: Throwable => throw e
-          }
         }
         case Failure(e) => throw e
+      }
+
+      result onFailure {
+        case e :Throwable => e.printStackTrace
       }
     }
     case record: AddSegmentRecord => {

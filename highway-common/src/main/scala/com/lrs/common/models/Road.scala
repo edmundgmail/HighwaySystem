@@ -12,6 +12,7 @@ class Road(val name:String, val roadId: Long, val mainDir: String, val direction
     s"{RoadName: $name mainDir:$mainDir directions: $directions"
   }
 
+  @throws[Exception]
   def removeSegment(dir:String, startPoint:PointRecord, endPoint:PointRecord) = {
       val startRP = ReferencePoint(startPoint.rpName, name, dir,0,0)
       val endRP = ReferencePoint(endPoint.rpName, name, dir, 0, 0)
