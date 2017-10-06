@@ -7,8 +7,8 @@ import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server._
 import akka.stream.{ActorMaterializer, ActorMaterializerSettings}
-import com.lrs.rest.actors.{RecordParseWorker, RecordPersistWorker}
-import com.lrs.rest.models.errors.{ExternalResourceException, ExternalResourceNotFoundException}
+import com.lrs.rest.actors.{RecordParseWorker, RecordPersistWorker, RecordProcessWorker}
+import com.lrs.common.models.errors.{ExternalResourceException, ExternalResourceNotFoundException}
 import com.lrs.rest.routes.{HighwayRoutes, MonitoringRoutes}
 import com.typesafe.config.ConfigFactory
 
@@ -26,8 +26,9 @@ object AkkaHttpScalaDockerSeed extends App {
 
   // route definitions
   //val queueRoutes = new QueueRoutes(queueConnector, stockPriceConnector)
-  val recordPersistWorker = system.actorOf(RecordPersistWorker.props)
-  val recordParseWorker = system.actorOf(RecordParseWorker.props)
+  val recordPersistWorker = system.actorOf(RecordPersistWorker.props, "recordPersistWorker-actor")
+  val recordProcessWorker = system.actorOf(RecordProcessWorker.props(recordPersistWorker), "recordProcessWorker-actor")
+  val recordParseWorker = system.actorOf(RecordParseWorker.props(recordProcessWorker), "recordParseWorker-actor")
 
   val highwayRoutes = new HighwayRoutes(recordPersistWorker, recordParseWorker)
   val monitoringRoutes = new MonitoringRoutes()

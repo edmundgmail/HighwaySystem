@@ -4,7 +4,7 @@ package com.lrs.common.models
   * Created by eguo on 8/26/17.
   */
 class Direction(val dir: String, val segments: List[Segment], val rps: List[ReferencePoint]) {
-
+  @throws(classOf[Exception])
   def removeSegment(start: SegmentPoint, end:SegmentPoint, removeRP:Boolean = true) : Direction = {
       val segment= Segment(start, end, 0)
       val seg = segments.filter(_.contains(rps, segment))

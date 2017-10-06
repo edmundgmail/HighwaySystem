@@ -8,13 +8,16 @@ import com.lrs.common.utils.MyImplicits._
 
 class Segment(val start: SegmentPoint, val end : SegmentPoint, val length:Double){
 
+  @throws(classOf[Exception])
   def contains(rps: List[ReferencePoint], seg:Segment) : Boolean = {
     val thisStart = ReferencePoint.getByID(start.referencePoint, rps)
     val thisEnd = ReferencePoint.getByID(end.referencePoint, rps)
     val thatStart = ReferencePoint.getByID(seg.start.referencePoint, rps)
     val thatEnd = ReferencePoint.getByID(seg.end.referencePoint, rps)
+
     AssertException(thisStart.isDefined && thisEnd.isDefined && thatStart.isDefined && thatEnd.isDefined)
-    return thisStart.get.globalOffset+start.offset <= thatStart.get.globalOffset+seg.start.offset &&
+
+    thisStart.get.globalOffset+start.offset <= thatStart.get.globalOffset+seg.start.offset &&
           thisEnd.get.globalOffset + end.offset >= thatEnd.get.globalOffset+seg.end.offset
   }
 

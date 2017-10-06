@@ -32,8 +32,8 @@ object  MongoUtils {
     collectionRoadTable.insertOne(road).toFuture
   }
 
-  def getRoad(roadId: Long) : Future[Seq[Road]] = {
-    collectionRoadTable.find(equal("roadId", roadId)).map(docToRoad).toFuture()
+  def getRoad(roadId: Long) = {
+    collectionRoadTable.find(equal("roadId", roadId)).toFuture
   }
 
   def updateRoad(road: Road) = {

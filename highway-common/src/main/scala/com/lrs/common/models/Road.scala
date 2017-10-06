@@ -1,5 +1,6 @@
 package com.lrs.common.models
 
+import com.lrs.common.models.errors.ExternalResourceNotFoundException
 import com.lrs.common.utils.{JsonReadable, JsonWritable}
 
 /**
@@ -12,8 +13,10 @@ class Road(val name:String, val roadId: Long, val mainDir: String, val direction
     s"{RoadName: $name mainDir:$mainDir directions: $directions"
   }
 
-  @throws[Exception]
+  @throws(classOf[Exception])
   def removeSegment(dir:String, startPoint:PointRecord, endPoint:PointRecord) = {
+    throw new ExternalResourceNotFoundException("error in removeSegment")
+
       val startRP = ReferencePoint(startPoint.rpName, name, dir,0,0)
       val endRP = ReferencePoint(endPoint.rpName, name, dir, 0, 0)
       val dirs = directions.filterNot(_.dir==dir) ++ directions.filter(_.dir==dir).map(d=>d.removeSegment(SegmentPoint("start", startRP.ID, startPoint.offset), SegmentPoint("end", endRP.ID, endPoint.offset)))

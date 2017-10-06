@@ -1,6 +1,7 @@
 package com.lrs.rest.routes
 
 import akka.actor.ActorRef
+import akka.http.scaladsl.model.HttpHeader.ParsingResult.Ok
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import akka.pattern.ask
@@ -28,7 +29,7 @@ class HighwayRoutes(recordPersistWorker: ActorRef, recordParseWorker: ActorRef)
         post{
           entity(as[JsObject]) {
             o => {
-              handleHighwayRecord(o)
+              complete(handleHighwayRecord(o).map(_.toString))
             }
           }
         }
@@ -42,9 +43,8 @@ class HighwayRoutes(recordPersistWorker: ActorRef, recordParseWorker: ActorRef)
   }
 
   private def handleHighwayRecord(record: JsObject) = {
-    recordPersistWorker ! RecordPersistWorker.AddHighway(record)
-    recordParseWorker ! record
-    complete("success")
+      val result = (recordParseWorker ? record)
+      result
   }
 
  }
