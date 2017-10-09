@@ -5,8 +5,10 @@ import org.mongodb.scala.model.Projections._
 import org.mongodb.scala.model.Filters._
 import spray.json._
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{Await, ExecutionContext, Future}
 import Implicits._
+
+import scala.concurrent.duration.Duration
 
 /**
   * Created by eguo on 9/21/17.
@@ -33,7 +35,8 @@ object  MongoUtils {
   }
 
   def getRoad(roadId: Long) = {
-    collectionRoadTable.find(equal("roadId", roadId)).toFuture
+    val road = collectionRoadTable.find(equal("roadId", roadId)).first().map(docToRoad).toFuture
+    Await.result(road, Duration.Inf).asInstanceOf[List[Document]]
   }
 
   def updateRoad(road: Road) = {

@@ -8,6 +8,7 @@ import spray.json.JsObject
 import akka.pattern.pipe
 import akka.pattern.ask
 import akka.util.Timeout
+import com.lrs.rest.models.QueueMessage
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -33,8 +34,7 @@ class RecordParseWorker(recordProcessWorker: ActorRef)  extends Actor with Actor
   def receive = {
     case record : JsObject => {
         val dr = gson.fromJson(record.toString, classOf[DataRecord])
-        val result = (recordProcessWorker ? dr)
-        sender() ! result
+        val result = (recordProcessWorker ? dr) .mapTo[QueueMessage] pipeTo sender()
     }
     case _ =>  throw new Exception("not implemented yet")
   }

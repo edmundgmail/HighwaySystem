@@ -1,5 +1,7 @@
 package com.lrs.rest
 
+import java.util.concurrent.TimeUnit
+
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.StatusCodes._
@@ -11,6 +13,9 @@ import com.lrs.rest.actors.{RecordParseWorker, RecordPersistWorker, RecordProces
 import com.lrs.common.models.errors.{ExternalResourceException, ExternalResourceNotFoundException}
 import com.lrs.rest.routes.{HighwayRoutes, MonitoringRoutes}
 import com.typesafe.config.ConfigFactory
+
+import scala.concurrent.Await
+import scala.concurrent.duration.Duration
 
 object AkkaHttpScalaDockerSeed extends App {
 
@@ -30,7 +35,7 @@ object AkkaHttpScalaDockerSeed extends App {
   val recordProcessWorker = system.actorOf(RecordProcessWorker.props(recordPersistWorker), "recordProcessWorker-actor")
   val recordParseWorker = system.actorOf(RecordParseWorker.props(recordProcessWorker), "recordParseWorker-actor")
 
-  val highwayRoutes = new HighwayRoutes(recordPersistWorker, recordParseWorker)
+  val highwayRoutes = new HighwayRoutes(recordPersistWorker, recordParseWorker, recordProcessWorker)
   val monitoringRoutes = new MonitoringRoutes()
   // implicit exception handler - this will be picked up by the route definitions
   implicit def myExceptionHandler: ExceptionHandler = customGlobalErrorHandler
@@ -42,6 +47,8 @@ object AkkaHttpScalaDockerSeed extends App {
   }
 
   Http().bindAndHandle(allRoutes, "0.0.0.0", 5000)
+
+  Await.ready(system.whenTerminated, Duration(1, TimeUnit.MINUTES))
 
 
   // When handling and completing errors as results like this
