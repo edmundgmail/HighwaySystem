@@ -11,7 +11,7 @@ import com.lrs.common.utils.Implicits._
 import akka.pattern.pipe
 import com.google.gson.GsonBuilder
 import com.lrs.common.models.errors.{ExternalResourceException, ExternalResourceNotFoundException}
-import com.lrs.rest.models.QueueMessage
+import com.lrs.rest.models.{HighwayStatus}
 import org.joda.time
 import org.joda.time.Seconds
 import spray.json.JsObject
@@ -26,7 +26,7 @@ object RecordProcessWorker{
   def props(actor:ActorRef): Props = Props(new RecordProcessWorker(recordPersistWorker = actor))
 }
 
-class RecordProcessWorker(recordPersistWorker: ActorRef) extends FailurePropatingActor with ActorLogging with Stash{
+class RecordProcessWorker(recordPersistWorker: ActorRef) extends Actor with ActorLogging with Stash{
   implicit val system = context.system
   val gsonBuilder = new GsonBuilder
   gsonBuilder.registerTypeAdapter(classOf[DataRecord], DataRecordDeserializer.getInstance)
@@ -41,42 +41,44 @@ class RecordProcessWorker(recordPersistWorker: ActorRef) extends FailurePropatin
       dr match {
 
         case record: AddRoadRecord =>  {
-          val road = MongoUtils.addRoad(Road.fromJson(record))
-          road.map(r=>QueueMessage("addRoad", Some(r.toString))) pipeTo sender()
+          try {
+            val road = Road.fromJson(record)
+            MongoUtils.addRoad(road)
+            sender() ! HighwayStatus.Ok
+          }
+          catch {
+            case _:Throwable => sender() ! HighwayStatus.ErrorAddRoad
+          }
         }
 
         case record: RemoveSegmentRecord => {
-          val road = MongoUtils.getRoad(record.roadId)
           try{
-            sender() ! road(0).removeSegment(record.dir, record.startPoint, record.endPoint)
+            val roads = MongoUtils.getRoad(record.roadId)
+            val newRoad = roads(0).removeSegment(record.dir, record.startPoint, record.endPoint)
+            MongoUtils.updateRoad(newRoad)
+            sender() ! HighwayStatus.Ok
           }
           catch {
-            case _ => sender() ! "error"
+            case _:Throwable => sender() ! HighwayStatus.ErrorRemoveRoadSegment
           }
+
         }
 
         case record: AddSegmentRecord => {
-          val road = MongoUtils.getRoad(record.roadId)
-          /*
-          val result = road andThen {
-            case Success(rs : Seq[Road])  =>  {
-              val newRoad = rs(0).addSegment(record.dir, record.segment, record.afterRP, record.leftConnect, record.beforeRP, record.rightConnect)
-              MongoUtils.updateRoad(newRoad).map(r=>QueueMessage("add", Some(r.toString)))  pipeTo sender()
-            }
-            case Failure(e) => throw e
-          }*/
+          try{
+            val roads = MongoUtils.getRoad(record.roadId)
+            val newRoad = roads(0).addSegment(record.dir, record.segment, record.afterRP, record.leftConnect, record.beforeRP, record.rightConnect)
+            MongoUtils.updateRoad(newRoad)
+            sender() ! HighwayStatus.Ok
+          }
+          catch {
+            case _:Throwable => sender() ! HighwayStatus.ErrorAddRoadSegment
+          }
         }
 
-        case e : Throwable => sender() ! e
-
+        case _ => sender() ! HighwayStatus.ErrorParseRoadJson
       }
 
     }
-    case Status.Failure(ex) => {
-      ex.printStackTrace()
-      throw ex
-    }
-
-
   }
 }
