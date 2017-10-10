@@ -1,6 +1,6 @@
 package com.lrs.rest.routes
 
-import akka.actor.ActorRef
+import akka.actor.{ActorRef, ActorSystem}
 import akka.http.scaladsl.model.HttpHeader.ParsingResult.Ok
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
@@ -16,9 +16,10 @@ import scala.concurrent.{ExecutionContextExecutor, Future}
 import scala.concurrent.duration._
 
 class HighwayRoutes(recordPersistWorker: ActorRef, recordProcessWorker: ActorRef)
-                   (implicit ec: ExecutionContextExecutor) {
+                   (implicit system: ActorSystem, ec: ExecutionContextExecutor) {
 
-  implicit val timeout = Timeout(1000.seconds)
+  implicit val timeout = Timeout(10.seconds)
+  implicit val log = system.log
 
   def routes: Route = {
     path("highway") {
@@ -47,12 +48,12 @@ class HighwayRoutes(recordPersistWorker: ActorRef, recordProcessWorker: ActorRef
       val ret = (recordProcessWorker ? record).mapTo[HighwayStatus.TypeVal]
       ret.flatMap {
         case HighwayStatus.Ok | HighwayStatus.Warning => {
-          println("process ok")
+          log.info("process ok")
           (recordPersistWorker ? RecordPersistWorker.AddHighway(record)).mapTo[HighwayStatus.TypeVal]
         }
 
         case _ => {
-          println("process not ok")
+          log.info("process not ok")
           ret
         }
       }
