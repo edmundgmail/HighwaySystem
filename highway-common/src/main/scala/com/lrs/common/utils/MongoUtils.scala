@@ -18,6 +18,7 @@ object  MongoUtils {
   val database: MongoDatabase = mongoClient.getDatabase("road")
   val collectionRoadRecordTable: MongoCollection[Document] = database.getCollection("RoadRecordTable")
   val collectionRoadTable: MongoCollection[Document] = database.getCollection("RoadTable")
+  System.setProperty("DEBUG.MONGO", "false")
 
   def addHighwayRecord(record: JsObject) = {
     val doc : Document = Document.apply(record.toString)
