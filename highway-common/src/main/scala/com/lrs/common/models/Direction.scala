@@ -1,9 +1,12 @@
 package com.lrs.common.models
 
+import com.lrs.common.utils.{AssertException, JsonWritable}
+import org.json4s.JsonWriter
+
 /**
   * Created by eguo on 8/26/17.
   */
-class Direction(val dir: String, val segments: List[Segment], val rps: List[ReferencePoint]) {
+class Direction(val dir: String, val segments: List[Segment], val rps: List[ReferencePoint]) extends JsonWritable{
   @throws(classOf[Exception])
   def removeSegment(start: SegmentPoint, end:SegmentPoint, removeRP:Boolean = true) : Direction = {
       val segment= Segment(start, end, 0)
@@ -79,7 +82,7 @@ class Direction(val dir: String, val segments: List[Segment], val rps: List[Refe
 
   def addSegment(segment: Segment, newRPs: List[ReferencePoint], afterRP: Option[ReferencePoint], leftConnect: Boolean, beforeRP:Option[ReferencePoint], rightConnect: Boolean) : Direction = {
     val totalDistance = newRPs.last.globalOffset + segment.end.offset
-    assert(segment.length == totalDistance)
+    AssertException(segment.length == totalDistance)
 
     (leftConnect, rightConnect) match {
       case (true, true) =>
@@ -90,7 +93,7 @@ class Direction(val dir: String, val segments: List[Segment], val rps: List[Refe
           val rightConnectSegment = segments.find(_.containsReferencePoint(beforeRP.get, rps)).get
           val rightConnectSegmentIndex = segments.indexOf(rightConnectSegment)
 
-          assert(leftConnectSegmentIndex == rightConnectSegmentIndex - 1)
+          AssertException(leftConnectSegmentIndex == rightConnectSegmentIndex - 1)
           val overalLength = leftConnectSegment.length+rightConnectSegment.length+segment.length
           val newSegment = Segment(leftConnectSegment.start, rightConnectSegment.end, overalLength )
           val (left, right) = segments.splitAt(leftConnectSegmentIndex)

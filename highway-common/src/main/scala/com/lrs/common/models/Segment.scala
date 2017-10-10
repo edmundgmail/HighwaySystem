@@ -1,12 +1,12 @@
 package com.lrs.common.models
 
-import com.lrs.common.utils.AssertException
+import com.lrs.common.utils.{AssertException, JsonWritable}
 import com.lrs.common.utils.MyImplicits._
 /**
   * Created by eguo on 8/26/17.
   */
 
-class Segment(val start: SegmentPoint, val end : SegmentPoint, val length:Double){
+class Segment(val start: SegmentPoint, val end : SegmentPoint, val length:Double) extends JsonWritable{
 
   @throws(classOf[Exception])
   def contains(rps: List[ReferencePoint], seg:Segment) : Boolean = {

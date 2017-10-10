@@ -1,41 +1,44 @@
 package com.lrs.common.models
 
+import com.fasterxml.jackson.annotation.JsonProperty
+import com.lrs.common.utils.{AssertException, JsonWritable}
+
 import scala.util.hashing.MurmurHash3
 import com.lrs.common.utils.MyImplicits._
 
 /**
   * Created by eguo on 8/26/17.
   */
-class Point (val name: String, val x: Double, val y:Double, val z:Double){
+class Point (val x: Double, val y:Double, val z:Double) extends JsonWritable{
   override def equals(obj: scala.Any): Boolean = {
     obj match {
-      case that:Point => that.name == this.name && that.x =~= this.x && that.y =~= this.y && that.z =~= this.z
+      case that:Point => that.x =~= this.x && that.y =~= this.y && that.z =~= this.z
       case _=> false
     }
   }
 }
 
-case class SegmentPoint(override val name: String, referencePoint: Int, offset: Double, override val x: Double = 0, override val y:Double = 0, override val z:Double = 0) extends Point(name,x,y,z){
+case class SegmentPoint(val name: String, referencePoint: Int, offset: Double, override val x: Double = 0, override val y:Double = 0, override val z:Double = 0) extends Point(x,y,z){
   override def toString: String = {
     s"SegmentPoint RP = ${referencePoint} offset=${offset}"
   }
 
   def useNext(rps: List[ReferencePoint]):SegmentPoint = {
       val i = ReferencePoint.findIDIndex(referencePoint, rps)
-      assert(i>=0)
+      AssertException(i>=0)
       if(i>=rps.length - 1) this
       else  {
-        assert(rps(i).distance>0)
+        AssertException(rps(i).distance>0)
         SegmentPoint(name, rps(i+1).ID, offset - rps(i).distance, x,y,z)
       }
   }
 
   def usePrev(rps:List[ReferencePoint]) : SegmentPoint= {
     val i = ReferencePoint.findIDIndex(referencePoint, rps)
-    assert(i>=0)
+    AssertException(i>=0)
     if(i==0) this
     else {
-      assert(rps(i-1).distance>0)
+      AssertException(rps(i-1).distance>0)
       SegmentPoint(name, rps(i-1).ID, offset + rps(i-1).distance, x,y,z)
     }
   }
@@ -48,7 +51,7 @@ case class SegmentPoint(override val name: String, referencePoint: Int, offset: 
   }
 }
 
-case class ReferencePoint(override val name: String, val roadName:String, val dir:String, val globalOffset: Double, val distance: Double, override val x: Double = 0, override val y:Double = 0, override val z:Double = 0) extends Point(name, x, y, z)
+case class ReferencePoint(val name: String, val roadName:String, val dir:String, val globalOffset: Double, val distance: Double, override val x: Double = 0, override val y:Double = 0, override val z:Double = 0) extends Point(x, y, z) with JsonWritable
 {
   def withIncrementOffset(offset:Double) = ReferencePoint(name, roadName, dir, globalOffset+offset, distance, x,y,z)
   def withDistance(d:Double) = ReferencePoint(name, roadName, dir, globalOffset, d, x,y,z)
