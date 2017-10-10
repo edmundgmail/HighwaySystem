@@ -52,8 +52,8 @@ class RecordProcessWorker(recordPersistWorker: ActorRef) extends Actor with Acto
 
         case record: RemoveSegmentRecord => {
           try{
-            val roads = MongoUtils.getRoad(record.roadId)
-            val newRoad = roads(0).removeSegment(record.dir, record.startPoint, record.endPoint)
+            val road = MongoUtils.getRoad(record.roadId)
+            val newRoad = road.removeSegment(record.dir, record.startPoint, record.endPoint)
             MongoUtils.updateRoad(newRoad)
             sender() ! HighwayStatus.Ok
           }
@@ -65,8 +65,8 @@ class RecordProcessWorker(recordPersistWorker: ActorRef) extends Actor with Acto
 
         case record: AddSegmentRecord => {
           try{
-            val roads = MongoUtils.getRoad(record.roadId)
-            val newRoad = roads(0).addSegment(record.dir, record.segment, record.afterRP, record.leftConnect, record.beforeRP, record.rightConnect)
+            val road = MongoUtils.getRoad(record.roadId)
+            val newRoad = road.addSegment(record.dir, record.segment, record.afterRP, record.leftConnect, record.beforeRP, record.rightConnect)
             MongoUtils.updateRoad(newRoad)
             sender() ! HighwayStatus.Ok
           }

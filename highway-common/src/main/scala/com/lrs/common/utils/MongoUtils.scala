@@ -39,7 +39,7 @@ object  MongoUtils {
 
   def getRoad(roadId: Long) = {
     val road = collectionRoadTable.find(equal("roadId", roadId)).first().toFuture
-    Await.result(road, Duration.Inf).asInstanceOf[List[Document]]
+    Await.result(road, Duration.Inf).asInstanceOf[Document]
   }
 
   def updateRoad(road: Road) = {

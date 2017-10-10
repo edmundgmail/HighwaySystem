@@ -45,14 +45,16 @@ class HighwayRoutes(recordPersistWorker: ActorRef, recordProcessWorker: ActorRef
 
   private def handleHighwayRecord(record: JsObject) = {
       val ret = (recordProcessWorker ? record).mapTo[HighwayStatus.TypeVal]
-
       ret.flatMap {
         case HighwayStatus.Ok | HighwayStatus.Warning => {
-
-          (recordPersistWorker ? record).mapTo[HighwayStatus.TypeVal]
+          println("process ok")
+          (recordPersistWorker ? RecordPersistWorker.AddHighway(record)).mapTo[HighwayStatus.TypeVal]
         }
 
-        case _ => ret
+        case _ => {
+          println("process not ok")
+          ret
+        }
       }
   }
 
