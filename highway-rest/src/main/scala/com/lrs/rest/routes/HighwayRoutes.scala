@@ -6,9 +6,9 @@ import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import akka.pattern.ask
 import akka.util.Timeout
+import com.lrs.common.models.errors.HighwayStatus
 import com.lrs.common.models.{AddRoadRecord, DataRecord, PointRecord}
 import com.lrs.rest.actors.{RecordPersistWorker, RecordProcessWorker}
-import com.lrs.rest.models.{HighwayStatus}
 import com.lrs.rest.models.marshalling.CustomMarshallers._
 import spray.json.{JsObject, JsValue}
 
@@ -44,7 +44,16 @@ class HighwayRoutes(recordPersistWorker: ActorRef, recordProcessWorker: ActorRef
   }
 
   private def handleHighwayRecord(record: JsObject) = {
-      (recordProcessWorker ? record).mapTo[HighwayStatus.TypeVal]
+      val ret = (recordProcessWorker ? record).mapTo[HighwayStatus.TypeVal]
+
+      ret.flatMap {
+        case HighwayStatus.Ok | HighwayStatus.Warning => {
+
+          (recordPersistWorker ? record).mapTo[HighwayStatus.TypeVal]
+        }
+
+        case _ => ret
+      }
   }
 
  }

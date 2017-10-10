@@ -10,8 +10,7 @@ import scala.util.{Failure, Success, Try}
 import com.lrs.common.utils.Implicits._
 import akka.pattern.pipe
 import com.google.gson.GsonBuilder
-import com.lrs.common.models.errors.{ExternalResourceException, ExternalResourceNotFoundException}
-import com.lrs.rest.models.{HighwayStatus}
+import com.lrs.common.models.errors.{ExternalResourceException, ExternalResourceNotFoundException, HighwayStatus}
 import org.joda.time
 import org.joda.time.Seconds
 import spray.json.JsObject
@@ -47,7 +46,7 @@ class RecordProcessWorker(recordPersistWorker: ActorRef) extends Actor with Acto
             sender() ! HighwayStatus.Ok
           }
           catch {
-            case _:Throwable => sender() ! HighwayStatus.ErrorAddRoad
+            case e:Throwable => sender() ! HighwayStatus.CustomError(HighwayStatus.ErrorAddRoad, e)
           }
         }
 
@@ -59,7 +58,7 @@ class RecordProcessWorker(recordPersistWorker: ActorRef) extends Actor with Acto
             sender() ! HighwayStatus.Ok
           }
           catch {
-            case _:Throwable => sender() ! HighwayStatus.ErrorRemoveRoadSegment
+            case e:Throwable => sender() ! HighwayStatus.CustomError(HighwayStatus.ErrorRemoveRoadSegment, e)
           }
 
         }
@@ -72,11 +71,11 @@ class RecordProcessWorker(recordPersistWorker: ActorRef) extends Actor with Acto
             sender() ! HighwayStatus.Ok
           }
           catch {
-            case _:Throwable => sender() ! HighwayStatus.ErrorAddRoadSegment
+            case e:Throwable => sender() ! HighwayStatus.CustomError(HighwayStatus.ErrorAddRoadSegment, e)
           }
         }
 
-        case _ => sender() ! HighwayStatus.ErrorParseRoadJson
+        case e : Throwable => sender() ! HighwayStatus.CustomError(HighwayStatus.ErrorParseRoadJson, e)
       }
 
     }

@@ -47,9 +47,7 @@ object AkkaHttpScalaDockerSeed extends App {
 
   Http().bindAndHandle(allRoutes, "0.0.0.0", 5000)
 
-  Await.ready(system.whenTerminated, Duration(1, TimeUnit.MINUTES))
-
-
+  Await.ready(system.whenTerminated, Duration.Inf)
   // When handling and completing errors as results like this
   // you have the option (see bellow) of not logging errors or log with a lower level when
   // failures are caused by the user (not the system itself)

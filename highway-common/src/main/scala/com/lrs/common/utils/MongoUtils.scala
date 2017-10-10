@@ -21,7 +21,9 @@ object  MongoUtils {
 
   def addHighwayRecord(record: JsObject) = {
     val doc : Document = Document.apply(record.toString)
-    collectionRoadRecordTable.insertOne(doc).toFuture
+    val road = collectionRoadRecordTable.insertOne(doc).toFuture
+    Await.result(road, Duration.Inf)
+
   }
 
 
@@ -31,16 +33,18 @@ object  MongoUtils {
   }
 
   def addRoad(road: Road) = {
-    collectionRoadTable.insertOne(road).toFuture
+    val newRoad = collectionRoadTable.insertOne(road).toFuture
+    Await.result(newRoad, Duration.Inf)
   }
 
   def getRoad(roadId: Long) = {
-    val road = collectionRoadTable.find(equal("roadId", roadId)).first().map(docToRoad).toFuture
+    val road = collectionRoadTable.find(equal("roadId", roadId)).first().toFuture
     Await.result(road, Duration.Inf).asInstanceOf[List[Document]]
   }
 
   def updateRoad(road: Road) = {
-    collectionRoadTable.findOneAndReplace(equal("roadId", road.roadId), road).toFuture
+    val newRoad = collectionRoadTable.findOneAndReplace(equal("roadId", road.roadId), road).toFuture
+    Await.result(newRoad, Duration.Inf)
   }
 
   def getAllHighways = {

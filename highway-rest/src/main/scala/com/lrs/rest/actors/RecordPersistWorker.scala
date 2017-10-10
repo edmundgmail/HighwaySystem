@@ -2,6 +2,7 @@ package com.lrs.rest.actors
 
 import akka.actor.{Actor, ActorLogging, Props, Stash}
 import akka.pattern.pipe
+import com.lrs.common.models.errors.HighwayStatus
 import com.lrs.common.models.{AddRoadRecord, DataRecord}
 import com.lrs.common.utils.MongoUtils
 import com.lrs.rest.actors.RecordPersistWorker.{AddHighway, GetHighway}
@@ -32,10 +33,21 @@ class RecordPersistWorker extends Actor with ActorLogging with Stash{
   def receive = {
 
     case GetHighway =>
-      MongoUtils.getAllHighways pipeTo sender()
+      try{
+        MongoUtils.getAllHighways pipeTo sender()
+      }
+      catch{
+        case e: Throwable => sender() ! HighwayStatus.CustomError(HighwayStatus.ErrorGetRoad, e)
+      }
 
     case AddHighway(r) =>
-      MongoUtils.addHighwayRecord(r) pipeTo sender()
+      try{
+        MongoUtils.addHighwayRecord(r)
+        sender() ! HighwayStatus.Ok
+      }
+      catch {
+        case e: Throwable => sender() ! HighwayStatus.CustomError(HighwayStatus.ErrorAddRoad, e)
+      }
   }
 
 
