@@ -48,7 +48,9 @@ object  MongoUtils {
       List(`match`(equal("roadId",roadId)),
       unwind("$directions"),
       `match`(equal("directions.dir",dir)),
-      group("_id", BsonField("roadId","$roadId"), push("rps","$directions.rps")),project(excludeId()))).map(_.toJson).toFuture
+      group("_id", first("rps", "$directions.rps"))
+      ,project(excludeId())))
+      .map(_.toJson).toFuture
   }
 
   def getRoad(roadId: Long) = {
