@@ -4,11 +4,15 @@ import org.mongodb.scala.{Document, MongoClient, MongoCollection, MongoDatabase}
 import org.mongodb.scala.model.Aggregates._
 import org.mongodb.scala.model.Filters._
 import org.mongodb.scala.model.Projections._
-
+import org.mongodb.scala.model.Accumulators._
 import spray.json._
 
 import scala.concurrent.{Await, ExecutionContext, Future}
 import Implicits._
+import com.mongodb.client.model.BsonField
+import org.mongodb.scala.bson.BsonDocument
+import org.mongodb.scala.bson.conversions.Bson
+import org.mongodb.scala.model.BsonField
 
 import scala.concurrent.duration.Duration
 
@@ -40,7 +44,11 @@ object  MongoUtils {
   }
 
   def getHighwayRPs(roadId: Long, dir: String) = {
-    collectionRoadTable.aggregate(Seq(filter(equal("roadId",roadId))))
+    collectionRoadTable.aggregate(
+      List(`match`(equal("roadId",roadId)),
+      unwind("$directions"),
+      `match`(equal("directions.dir",dir)),
+      group("_id", BsonField("roadId","$roadId"), push("rps","$directions.rps")),project(excludeId()))).map(_.toJson).toFuture
   }
 
   def getRoad(roadId: Long) = {
