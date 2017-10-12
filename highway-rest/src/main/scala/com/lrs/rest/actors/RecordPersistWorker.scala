@@ -5,7 +5,7 @@ import akka.pattern.pipe
 import com.lrs.common.models.errors.HighwayStatus
 import com.lrs.common.models.{AddRoadRecord, DataRecord}
 import com.lrs.common.utils.MongoUtils
-import com.lrs.rest.actors.RecordPersistWorker.{AddHighway, GetHighway}
+import com.lrs.rest.actors.RecordPersistWorker.{AddHighway, GetHighway, GetHighwayRPs}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import spray.json._
@@ -19,8 +19,8 @@ object RecordPersistWorker {
 
   def props(): Props = Props(new RecordPersistWorker)
 
-  case class GetHighway()
-  case class GetHighwayDetails(name: String, id: String)
+  case class GetHighway(roadId:Long)
+  case class GetHighwayRPs(roadId: Long, dir: String)
   case class AddHighway(record: JsObject)
 }
 
@@ -32,9 +32,16 @@ class RecordPersistWorker extends Actor with ActorLogging with Stash{
 
   def receive = {
 
-    case GetHighway =>
+    case GetHighwayRPs(id, dir) => {
+      MongoUtils.getHighwayRPs(id, dir) pipeTo sender()
+    }
+
+    case GetHighway(roadId) =>
       try{
-        MongoUtils.getAllHighways pipeTo sender()
+        if(roadId == 0)
+          MongoUtils.getAllHighways pipeTo sender()
+        else
+          sender() ! MongoUtils.getRoad(roadId)
       }
       catch{
         case e: Throwable => sender() ! HighwayStatus.CustomError(HighwayStatus.ErrorGetRoad, e)

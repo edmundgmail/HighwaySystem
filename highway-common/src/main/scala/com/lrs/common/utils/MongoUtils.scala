@@ -1,8 +1,10 @@
 package com.lrs.common.utils
 import com.lrs.common.models._
 import org.mongodb.scala.{Document, MongoClient, MongoCollection, MongoDatabase}
-import org.mongodb.scala.model.Projections._
+import org.mongodb.scala.model.Aggregates._
 import org.mongodb.scala.model.Filters._
+import org.mongodb.scala.model.Projections._
+
 import spray.json._
 
 import scala.concurrent.{Await, ExecutionContext, Future}
@@ -33,13 +35,16 @@ object  MongoUtils {
       //.sort(exists("dateTime")).sort(descending("dateTime")).toFuture
   }
 
-  def addRoad(road: Road) = {
-    val newRoad = collectionRoadTable.insertOne(road).toFuture
-    Await.result(newRoad, Duration.Inf)
+  def getAllHighways = {
+    collectionRoadTable.find().projection(fields(include("roadName","roadId"), excludeId())).map(_.toJson).toFuture
+  }
+
+  def getHighwayRPs(roadId: Long, dir: String) = {
+    collectionRoadTable.aggregate(Seq(filter(equal("roadId",roadId))))
   }
 
   def getRoad(roadId: Long) = {
-    val road = collectionRoadTable.find(equal("roadId", roadId)).first().toFuture
+    val road = collectionRoadTable.find().projection(excludeId()).first().toFuture
     Await.result(road, Duration.Inf).asInstanceOf[Document]
   }
 
@@ -48,8 +53,9 @@ object  MongoUtils {
     Await.result(newRoad, Duration.Inf)
   }
 
-  def getAllHighways = {
-    collectionRoadRecordTable.find().projection(fields(include("roadName","roadId"), excludeId())).map(_.toJson).toFuture
+  def addRoad(road: Road) = {
+    val newRoad = collectionRoadTable.insertOne(road).toFuture
+    Await.result(newRoad, Duration.Inf)
   }
 
 }

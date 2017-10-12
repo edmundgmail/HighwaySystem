@@ -22,10 +22,18 @@ class HighwayRoutes(recordPersistWorker: ActorRef, recordProcessWorker: ActorRef
   implicit val log = system.log
 
   def routes: Route = {
-    path("highway") {
-        get {
-          complete{
-            listHighways
+
+    pathPrefix("highway") {
+      (path("rps") & get){
+        parameters('roadId.as[Long], 'dir.as[String]){
+          (roadId, dir) => {
+            complete(getHighwayRPs(roadId, dir))
+          }
+        }
+      } ~
+      get {
+          parameters('roadId? 0){
+            (roadId) => complete(listHighways(roadId))
           }
         } ~
         post{
@@ -39,8 +47,13 @@ class HighwayRoutes(recordPersistWorker: ActorRef, recordProcessWorker: ActorRef
   }
 
 
-  private def listHighways = {
-    val result = (recordPersistWorker? RecordPersistWorker.GetHighway).map(_.toString)
+  private def listHighways(roadId: Long) = {
+    val result = (recordPersistWorker? RecordPersistWorker.GetHighway(roadId)).map(_.toString)
+    result
+  }
+
+  private def getHighwayRPs(roadId: Long, dir: String) = {
+    val result = (recordPersistWorker? RecordPersistWorker.GetHighwayRPs(roadId, dir)).map(_.toString)
     result
   }
 
