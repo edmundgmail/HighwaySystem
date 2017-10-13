@@ -31,6 +31,13 @@ class HighwayRoutes(recordPersistWorker: ActorRef, recordProcessWorker: ActorRef
           }
         }
       } ~
+      (path("segments") & get){
+          parameters('roadId.as[Long], 'dir.as[String]){
+            (roadId, dir) => {
+              complete(getHighwaySegments(roadId, dir))
+            }
+          }
+      } ~
       get {
           parameters('roadId? 0){
             (roadId) => complete(listHighways(roadId))
@@ -54,6 +61,11 @@ class HighwayRoutes(recordPersistWorker: ActorRef, recordProcessWorker: ActorRef
 
   private def getHighwayRPs(roadId: Long, dir: String) = {
     val result = (recordPersistWorker? RecordPersistWorker.GetHighwayRPs(roadId, dir)).map(_.toString)
+    result
+  }
+
+  private def getHighwaySegments(roadId: Long, dir: String) = {
+    val result = (recordPersistWorker? RecordPersistWorker.GetHighwaySegments(roadId, dir)).map(_.toString)
     result
   }
 

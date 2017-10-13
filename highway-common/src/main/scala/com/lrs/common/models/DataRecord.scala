@@ -21,3 +21,5 @@ case class AddRoadRecord(val action: String, val dateTime: String, val roadId: L
 case class RemoveSegmentRecord(val action: String, val dateTime: String, val roadId: Long, val dir:String, val startPoint: PointRecord, val endPoint:PointRecord) extends DataRecord(action, dateTime, roadId)
 
 case class AddSegmentRecord(val action: String, val dateTime: String, val roadId: Long, val dir:String, val segment:String, val leftConnect : Boolean, val afterRP: String, val rightConnect: Boolean, val beforeRP:String ) extends DataRecord(action, dateTime, roadId)
+
+case class RemoveLaneRecord(val action:String, val dateTime: String, val roadId: Long, val dir:String, val startPoint: PointRecord, val endPoint: PointRecord, val numberOfLanes: Integer, val outside: Boolean = true) extends DataRecord(action, dateTime, roadId)case class AddLaneRecord(val action:String, val dateTime: String, val roadId: Long, val dir:String, val startPoint: PointRecord, val endPoint: PointRecord, val numberOfLanes: Integer, val outside: Boolean = true) extends DataRecord(action, dateTime, roadId)

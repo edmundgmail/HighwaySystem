@@ -53,6 +53,16 @@ object  MongoUtils {
       .map(_.toJson).toFuture
   }
 
+  def getHighwaySegments(roadId: Long, dir: String) = {
+    collectionRoadTable.aggregate(
+      List(`match`(equal("roadId",roadId)),
+        unwind("$directions"),
+        `match`(equal("directions.dir",dir)),
+        group("_id", first("segments", "$directions.segments"))
+        ,project(excludeId())))
+      .map(_.toJson).toFuture
+  }
+
   def getRoad(roadId: Long) = {
     val road = collectionRoadTable.find().projection(excludeId()).first().toFuture
     Await.result(road, Duration.Inf).asInstanceOf[Document]
