@@ -6,38 +6,8 @@ import com.lrs.common.utils.MyImplicits._
   * Created by eguo on 8/26/17.
   */
 
-class Segment(val start: SegmentPoint, val end : SegmentPoint, val length:Double) extends JsonWritable{
+class Segment(val start: SegmentPoint, val end : SegmentPoint, val length:Double) extends Line with JsonWritable{
 
-  @throws(classOf[Exception])
-  def contains(rps: List[ReferencePoint], seg:Segment) : Boolean = {
-    val thisStart = ReferencePoint.getByID(start.referencePoint, rps)
-    val thisEnd = ReferencePoint.getByID(end.referencePoint, rps)
-    val thatStart = ReferencePoint.getByID(seg.start.referencePoint, rps)
-    val thatEnd = ReferencePoint.getByID(seg.end.referencePoint, rps)
-
-    AssertException(thisStart.isDefined && thisEnd.isDefined && thatStart.isDefined && thatEnd.isDefined)
-
-    thisStart.get.globalOffset+start.offset <= thatStart.get.globalOffset+seg.start.offset &&
-          thisEnd.get.globalOffset + end.offset >= thatEnd.get.globalOffset+seg.end.offset
-  }
-
-  def containsReferencePoint(rp:ReferencePoint, rps:List[ReferencePoint]) : Boolean = {
-    val startRP = ReferencePoint.getByID(start.referencePoint, rps)
-    val endRP = ReferencePoint.getByID(end.referencePoint, rps)
-
-    if(startRP.isDefined && endRP.isDefined){
-      val startOffset = startRP.get.globalOffset + start.offset
-      val endOffset  = endRP.get.globalOffset+end.offset
-
-      rp.globalOffset>= startOffset && rp.globalOffset<=endOffset
-    }
-    else
-      false
-  }
-
-  def containedReferencePoints(rps:List[ReferencePoint]) : List[ReferencePoint] = {
-    rps.filter(r=>containsReferencePoint(r, rps))
-  }
 
   override def equals(obj: scala.Any): Boolean = {
     obj match {

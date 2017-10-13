@@ -6,7 +6,7 @@ import org.json4s.JsonWriter
 /**
   * Created by eguo on 8/26/17.
   */
-class Direction(val dir: String, val segments: List[Segment], val rps: List[ReferencePoint]) extends JsonWritable{
+class Direction(val dir: String, val segments: List[Segment], val rps: List[ReferencePoint], val lanes: List[Lane]) extends JsonWritable{
   @throws(classOf[Exception])
   def removeSegment(start: SegmentPoint, end:SegmentPoint, removeRP:Boolean = true) : Direction = {
       val segment= Segment(start, end, 0)
@@ -36,7 +36,7 @@ class Direction(val dir: String, val segments: List[Segment], val rps: List[Refe
             rps
       }
 
-      Direction(dir, left ++ seg(0).minus(segment, rps) ++ right.drop(1), remainingRPs)
+      Direction(dir, left ++ seg(0).minus(segment, rps) ++ right.drop(1), remainingRPs, this.lanes)
   }
 
   private def mergedRPs(inserted: List[ReferencePoint], afterRP:Option[ReferencePoint], beforeRP:Option[ReferencePoint], leftConnect:Boolean, rightConnect:Boolean, length:Double): List[ReferencePoint] ={
@@ -101,7 +101,7 @@ class Direction(val dir: String, val segments: List[Segment], val rps: List[Refe
           val lastRP = newRPs.last.withDistance(segment.end.offset - rightConnectSegment.start.offset)
           val newRPs1 = (newRPs.dropRight(1):+lastRP).map(_.withIncrementOffset(leftRP.globalOffset+leftConnectSegment.end.offset))
           val newRPList = mergedRPs(newRPs1, Some(leftRP), beforeRP,  leftConnect, rightConnect, segment.length)
-          Direction(dir, (left :+ newSegment) ::: right.drop(2), newRPList)
+          Direction(dir, (left :+ newSegment) ::: right.drop(2), newRPList, this.lanes)
         }
 
       case (true, false) =>
@@ -113,7 +113,7 @@ class Direction(val dir: String, val segments: List[Segment], val rps: List[Refe
           val leftRP = afterRP.get.withDistance(leftConnectSegment.end.offset - segment.start.offset)
           val newRPs1 = newRPs.map(_.withIncrementOffset(leftRP.globalOffset+leftConnectSegment.end.offset))
           val newRPList =  mergedRPs(newRPs1, Some(leftRP), beforeRP, leftConnect, rightConnect, segment.length)
-          Direction(dir, (left :+ newSegement) ::: right.drop(1), newRPList)
+          Direction(dir, (left :+ newSegement) ::: right.drop(1), newRPList, this.lanes)
         }
 
       case (false, true) =>
@@ -126,12 +126,12 @@ class Direction(val dir: String, val segments: List[Segment], val rps: List[Refe
           val rightConnectRP = ReferencePoint.getByID(rightConnectSegment.start.referencePoint, rps)
           val newRPs1 = (newRPs.dropRight(1):+rightRP).map(_.withIncrementOffset(rightConnectRP.get.globalOffset+rightConnectSegment.start.offset))
           val newRPList = mergedRPs(newRPs1, afterRP, beforeRP, leftConnect,rightConnect, segment.length)
-          Direction(dir, (left :+ newSegement) ::: right.drop(1), newRPList)
+          Direction(dir, (left :+ newSegement) ::: right.drop(1), newRPList, this.lanes)
         }
       case (false, false) => {
         (afterRP, beforeRP) match {
           case (None, None) => {
-            Direction(dir, List(segment), newRPs)
+            Direction(dir, List(segment), newRPs, this.lanes)
           }
           case (Some(x), _) => {
             val leftConnectSegment = segments.find(_.containsReferencePoint(x, rps)).get
@@ -140,7 +140,7 @@ class Direction(val dir: String, val segments: List[Segment], val rps: List[Refe
             val leftRP = ReferencePoint.getByID(leftConnectSegment.end.referencePoint, rps)
             val newRPs1 = newRPs.map(_.withIncrementOffset(leftConnectSegment.end.offset+leftRP.get.globalOffset))
             val newRPList = mergedRPs(newRPs1, afterRP, beforeRP, leftConnect,rightConnect, segment.length)
-            Direction(dir, (left :+ segment) ++ right, newRPList)
+            Direction(dir, (left :+ segment) ++ right, newRPList, this.lanes)
           }
           case(_, Some(x)) =>{
             val rightConnectSegment = segments.find(_.containsReferencePoint(x, rps)).get
@@ -149,7 +149,7 @@ class Direction(val dir: String, val segments: List[Segment], val rps: List[Refe
             val rightRP = ReferencePoint.getByID(rightConnectSegment.start.referencePoint, rps)
             val newRPs1 = newRPs.map(_.withIncrementOffset((rightRP.get.globalOffset+rightConnectSegment.start.offset)))
             val newRPList = mergedRPs(newRPs1, afterRP, beforeRP, leftConnect, rightConnect, segment.length)
-            Direction(dir, (left :+ segment) ++ right, newRPList)
+            Direction(dir, (left :+ segment) ++ right, newRPList, this.lanes)
           }
         }
       }
@@ -170,15 +170,19 @@ class Direction(val dir: String, val segments: List[Segment], val rps: List[Refe
   override def toString: String = {
     s"{Direction dir=${dir} segments]s${segments.toString} rps=s${rps.toString} }"
   }
+
+  def addLane(start: SegmentPoint, end:SegmentPoint, n:Int, outside: Boolean) = {
+
+  }
 }
 
 object Direction{
-  def apply(dir:String, segments:List[Segment], rps: List[ReferencePoint]) = new Direction(dir, segments, rps)
+  def apply(dir:String, segments:List[Segment], rps: List[ReferencePoint], lanes: List[Lane]) = new Direction(dir, segments, rps, lanes)
 
   def fromString(roadName:String, dir:String, road: List[String]) : Direction = {
     val (_segs, _rps) = road.map(str=>Segment.fromString(roadName, dir, str)).unzip
     val segOffsets = _segs.zipWithIndex.map(s=>_segs.take(s._2).map(_.length).sum)
     val newRPs = _rps.zipWithIndex.map(l=>l._1.map(_.withIncrementOffset(segOffsets(l._2)))).flatten
-    Direction(dir, _segs, newRPs)
+    Direction(dir, _segs, newRPs, List.empty)
   }
 }
