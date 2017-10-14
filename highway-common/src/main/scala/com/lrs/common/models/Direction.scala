@@ -171,13 +171,19 @@ class Direction(val dir: String, val segments: List[Segment], val rps: List[Refe
     s"{Direction dir=${dir} segments]s${segments.toString} rps=s${rps.toString} }"
   }
 
-  def addLane(start: SegmentPoint, end:SegmentPoint, n:Int, outside: Boolean) = {
+  def addLane(start: SegmentPoint, end:SegmentPoint, n:Int, outside: Boolean) : Direction = {
+    val newLane = new Lane(start, end, (1 to n ).toList)
+    val newLanes = newLane.except(rps, this.lanes)
+    val overlapLanes = newLane.getOverlap(rps, this.lanes).asInstanceOf[List[Lane]].map(lane=>lane.add(n, outside))
+    Direction(this.dir,  this.segments, this.rps, (newLanes ++ overlapLanes).asInstanceOf[List[Lane]])
 
   }
+
+  def removeLane( start: SegmentPoint, end:SegmentPoint, n:Int, outside: Boolean) : Direction = ???
 }
 
 object Direction{
-  def apply(dir:String, segments:List[Segment], rps: List[ReferencePoint], lanes: List[Lane]) = new Direction(dir, segments, rps, lanes)
+  def apply(dir:String, segments:List[Segment], rps: List[ReferencePoint], lanes: List[Lane] = List.empty) = new Direction(dir, segments, rps, lanes)
 
   def fromString(roadName:String, dir:String, road: List[String]) : Direction = {
     val (_segs, _rps) = road.map(str=>Segment.fromString(roadName, dir, str)).unzip
