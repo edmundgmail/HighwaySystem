@@ -6,7 +6,7 @@ import org.json4s.JsonWriter
 /**
   * Created by eguo on 8/26/17.
   */
-class Direction(val dir: String, val segments: List[Segment], val rps: List[ReferencePoint], val lanes: List[Lane]) extends JsonWritable{
+class Direction(val dir: String, val segments: List[Segment], val rps: List[ReferencePoint], val lanes: List[Line[Lane]]) extends JsonWritable{
   @throws(classOf[Exception])
   def removeSegment(start: SegmentPoint, end:SegmentPoint, removeRP:Boolean = true) : Direction = {
       val segment= Segment(start, end, 0)
@@ -174,16 +174,23 @@ class Direction(val dir: String, val segments: List[Segment], val rps: List[Refe
   def addLane(start: SegmentPoint, end:SegmentPoint, n:Int, outside: Boolean) : Direction = {
     val newLane = new Lane(start, end, (1 to n ).toList)
     val newLanes = newLane.except(rps, this.lanes)
-    val overlapLanes = newLane.getOverlap(rps, this.lanes).asInstanceOf[List[Lane]].map(lane=>lane.add(n, outside))
-    Direction(this.dir,  this.segments, this.rps, (newLanes ++ overlapLanes).asInstanceOf[List[Lane]])
+    val overlapLanes = this.lanes.map(l=>l.getOverlap(rps, newLane)).flatten.map(f=>f.add(n, outside))
+    val nonOverlaped = this.lanes.filterNot(l=>l.overlap(rps, newLane))
 
+    Direction(this.dir,  this.segments, this.rps, (newLanes ++ overlapLanes ++ nonOverlaped))
   }
 
-  def removeLane( start: SegmentPoint, end:SegmentPoint, n:Int, outside: Boolean) : Direction = ???
+  def removeLane( start: SegmentPoint, end:SegmentPoint, n:Int, outside: Boolean) : Direction = {
+    val newLane = new Lane(start, end, (1 to n).toList)
+    val overlapLanes = this.lanes.map(l=>l.getOverlap(rps, newLane)).flatten.map(f=>f.remove(n, outside))
+    val nonOverlaped = this.lanes.filterNot(l=>l.overlap(rps, newLane))
+
+    Direction(this.dir, this.segments, this.rps, (overlapLanes ++ nonOverlaped))
+  }
 }
 
 object Direction{
-  def apply(dir:String, segments:List[Segment], rps: List[ReferencePoint], lanes: List[Lane] = List.empty) = new Direction(dir, segments, rps, lanes)
+  def apply(dir:String, segments:List[Segment], rps: List[ReferencePoint], lanes: List[Line[Lane]] = List.empty) = new Direction(dir, segments, rps, lanes)
 
   def fromString(roadName:String, dir:String, road: List[String]) : Direction = {
     val (_segs, _rps) = road.map(str=>Segment.fromString(roadName, dir, str)).unzip

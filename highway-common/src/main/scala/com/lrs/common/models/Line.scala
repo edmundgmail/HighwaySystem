@@ -40,8 +40,8 @@ abstract class Line[B<:Line[B]]{
 
   def getOverlap(rps: List[ReferencePoint], that: Line[B]) : Option[Line[B]] = {
     if(this.overlap(rps, that)) {
-        if(this.contains(rps, that)) Some(that)
-        else if(that.contains(rps, this)) Some(this.asInstanceOf[B])
+        if(this.contains(rps, that)) Some(this.clone(that.start, that.end))
+        else if(that.contains(rps, this)) Some(this)
         else {
           isBefore(rps, this.start, that.start) match {
             case 1 => Some(this.clone(that.start, this.end))
@@ -55,6 +55,9 @@ abstract class Line[B<:Line[B]]{
 
   def clone(start:SegmentPoint, end: SegmentPoint) : Line[B]
 
+  def add(n: Int, outside: Boolean) = this
+  def remove(n: Int, outside: Boolean) = this
+
   def except (rps:List[ReferencePoint], that: Line[B]) : List[Line[B]] = {
     if(this.overlap(rps, that)) {
       (isBefore(rps, this.start, that.start), isBefore(rps, this.end, that.end)) match {
@@ -65,7 +68,7 @@ abstract class Line[B<:Line[B]]{
       }
     }
     else
-      List(this.asInstanceOf[B])
+      List(this)
   }
 
   def getOverlap(rps: List[ReferencePoint], lines : List[Line[B]]) : List[Line[B]] = {
