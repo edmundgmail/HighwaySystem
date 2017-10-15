@@ -168,7 +168,7 @@ class Direction(val dir: String, val segments: List[Segment], val rps: List[Refe
   }
 
   override def toString: String = {
-    s"{Direction dir=${dir} segments]s${segments.toString} rps=s${rps.toString} }"
+    s"{Direction dir=${dir} segments]${segments.toString} rps=${rps.toString} lanes=${lanes.toString} }"
   }
 
   def addLane(start: SegmentPoint, end:SegmentPoint, n:Int, outside: Boolean) : Direction = {
