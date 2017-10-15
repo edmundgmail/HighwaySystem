@@ -5,7 +5,8 @@ import com.lrs.common.utils.AssertException
 /**
   * Created by vagrant on 10/13/17.
   */
-trait Line{
+abstract class Line[B<:Line[B]]{
+  self: Line[B] =>
 
   val start : SegmentPoint
   val end : SegmentPoint
@@ -21,7 +22,7 @@ trait Line{
       (thisEnd.get.globalOffset+end.offset >= thatRP.get.globalOffset+that.offset)
   }
 
-  def overlap(rps: List[ReferencePoint], that:Line) : Boolean = {
+  def overlap(rps: List[ReferencePoint], that: Line[B]) : Boolean = {
     this.contains(rps, that.start) || this.contains(rps, that.end) || that.contains(rps, this.start) /*|| that.contains(rps, this.end)*/
   }
 
@@ -37,14 +38,14 @@ trait Line{
   }
 
 
-  def getOverlap(rps: List[ReferencePoint], that: Line) : Option[Line] = {
+  def getOverlap(rps: List[ReferencePoint], that: Line[B]) : Option[Line[B]] = {
     if(this.overlap(rps, that)) {
         if(this.contains(rps, that)) Some(that)
-        else if(that.contains(rps,this)) Some(this)
+        else if(that.contains(rps, this)) Some(this.asInstanceOf[B])
         else {
           isBefore(rps, this.start, that.start) match {
-            case 1 => Some(Line(that.start, this.end))
-            case -1 => Some(Line(this.start,that.end))
+            case 1 => Some(this.clone(that.start, this.end))
+            case -1 => Some(this.clone(this.start,that.end))
           }
         }
     }
@@ -52,33 +53,35 @@ trait Line{
       None
   }
 
-  def except (rps:List[ReferencePoint], that: Line ) : List[Line ] = {
+  def clone(start:SegmentPoint, end: SegmentPoint) : Line[B]
+
+  def except (rps:List[ReferencePoint], that: Line[B]) : List[Line[B]] = {
     if(this.overlap(rps, that)) {
       (isBefore(rps, this.start, that.start), isBefore(rps, this.end, that.end)) match {
-        case (1, -1) => List(Line(this.start, that.start), Line(that.end,this.end))
-        case (1, _)   => List(Line(this.start, that.start))
-        case (_, -1) => List(Line(that.end, this.end))
+        case (1, -1) => List(this.clone(this.start, that.start), this.clone(that.end,this.end))
+        case (1, _)   => List(this.clone(this.start, that.start))
+        case (_, -1) => List(this.clone(that.end, this.end))
         case (_, _) => List.empty
       }
     }
     else
-      List(this)
+      List(this.asInstanceOf[B])
   }
 
-  def getOverlap(rps: List[ReferencePoint], lines : List[Line ]) : List[Line ] = {
+  def getOverlap(rps: List[ReferencePoint], lines : List[Line[B]]) : List[Line[B]] = {
     lines.map(line=>this.getOverlap(rps, line)).filter(_.isDefined).map(_.get)
   }
 
-  def except(rps: List[ReferencePoint], those: List[ Line ]) : List[Line ] = {
-      those.foldRight[List[Line]](List(this)){
-        (line : Line , lines : List[Line ]) => {
+  def except(rps: List[ReferencePoint], those: List[ Line[B]]) : List[Line[B] ] = {
+      those.foldRight[List[Line[B]]](List(this)){
+        (line : Line[B] , lines : List[Line[B] ]) => {
           lines.map(result=> result.except(rps, line)).flatten.toList
         }
       }
   }
 
   @throws(classOf[Exception])
-  def contains(rps: List[ReferencePoint], seg: Line ) : Boolean = {
+  def contains(rps: List[ReferencePoint], seg: Line[B] ) : Boolean = {
     val thisStart = ReferencePoint.getByID(start.referencePoint, rps)
     val thisEnd = ReferencePoint.getByID(end.referencePoint, rps)
     val thatStart = ReferencePoint.getByID(seg.start.referencePoint, rps)
@@ -109,9 +112,3 @@ trait Line{
   }
 }
 
-object Line{
-  def apply(start : SegmentPoint, end: SegmentPoint): Line = new Line{
-      val start : SegmentPoint = start
-      val end  : SegmentPoint = end
-    }
-}

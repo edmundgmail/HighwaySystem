@@ -6,7 +6,7 @@ import com.lrs.common.utils.MyImplicits._
   * Created by eguo on 8/26/17.
   */
 
-class Segment(val start: SegmentPoint, val end : SegmentPoint, val length:Double) extends Line with JsonWritable{
+case class Segment(val start: SegmentPoint, val end : SegmentPoint, val length:Double) extends Line[Segment] with JsonWritable{
 
 
   override def equals(obj: scala.Any): Boolean = {
@@ -14,6 +14,10 @@ class Segment(val start: SegmentPoint, val end : SegmentPoint, val length:Double
       case that:Segment => that.start == start && that.end == end && that.length =~= length
       case _=>false
     }
+  }
+
+  override def clone(start: SegmentPoint, end: SegmentPoint): Segment = {
+    this.copy(start = start, end  = end)
   }
 
   def minus (segment:Segment, rps:List[ReferencePoint]) : List[Segment] = {
@@ -44,8 +48,6 @@ class Segment(val start: SegmentPoint, val end : SegmentPoint, val length:Double
 }
 
 object Segment{
-  def apply(start:SegmentPoint, end:SegmentPoint, length: Double) = new Segment(start,end,length)
-
   def fromString(roadName:String, dir:String, segment:String) : (Segment, List[ReferencePoint]) = {
     val dis = segment.split(",").zipWithIndex.filter(_._2%2 == 0).map(_._1.toDouble)
     val rpnames = segment.split(",").zipWithIndex.filter(_._2%2 == 1).map(_._1)
