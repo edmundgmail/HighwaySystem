@@ -26,5 +26,62 @@ case class Lane(val start: SegmentPoint, val end: SegmentPoint, val indexes: Lis
     }
   }
 
+
+}
+
+case class LaneChangeRecord(override val start: SegmentPoint, override  val end: SegmentPoint, n: Int, outside : Boolean) extends Line[Lane]
+
+object Lane {
+
+  type LaneRecord = (SegmentPoint, SegmentPoint, String)
+  /*rp1,offset1, rp2,offset2, 1, in*/
+  /*rp1,offset1, rp2,offset2, 2, out*/
+  private def parseLaneRecord (rps : List[ReferencePoint], inputString:String) : Option[LaneRecord] = {
+    val input = inputString.split(",")
+    AssertException(input.length >= 4 )
+    val startRP = ReferencePoint.getByName(rps, input(0))
+    val endRP = ReferencePoint.getByName(rps, input(2))
+    AssertException(startRP.isDefined && endRP.isDefined)
+    try {
+      val startOffset = input(1).toDouble
+      val endOffset = input(3).toDouble
+      Some(SegmentPoint("start", startRP.get.ID, startOffset), SegmentPoint("end", endRP.get.ID, endOffset), input.drop(4).mkString(","))
+    }
+    catch{
+      case e: Throwable => AssertException (false, e.getMessage); None
+    }
+  }
+
+  @throws[Exception]
+  def parseLaneChangeRecord(rps : List[ReferencePoint], inputString:String) : Option[LaneChangeRecord] = {
+      val laneRecord = parseLaneRecord(rps, inputString)
+      laneRecord match {
+        case Some(record) => {
+          val inputs = record._3.split(",")
+          try{
+            val n = inputs(0).toInt
+            val outside = inputs.length == 1 || inputs(1)!="inside"
+            Some(LaneChangeRecord(record._1, record._2,n, outside))
+          }
+          catch {
+            case _=> None
+          }
+        }
+        case _ => None
+      }
+  }
+
+  def fromString(rps: List[ReferencePoint], inputString: String ) : Option[Lane] = {
+      val laneRecord = parseLaneRecord(rps, inputString)
+
+    laneRecord match {
+        case Some(record) => {
+            val indexes = "(\\d+)".r.findAllIn(record._3).toList.map(_.toInt)
+            Some(Lane(record._1, record._2, indexes))
+        }
+        case _ => None
+      }
+  }
+
 }
 

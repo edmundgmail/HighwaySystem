@@ -89,6 +89,12 @@ object ReferencePoint{
       if(rpIDs.isEmpty) None
       else Some(rpIDs(0))
    }
+
+  def getByName(rps:List[ReferencePoint], rpName: String) : Option[ReferencePoint] = {
+    val ret = rps.filter(_.name==rpName)
+    if(ret.isEmpty) None
+    else Some(ret(0))
+  }
 }
 
 

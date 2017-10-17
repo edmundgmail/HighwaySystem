@@ -53,7 +53,7 @@ abstract class Line[B<:Line[B]]{
       None
   }
 
-  def clone(start:SegmentPoint, end: SegmentPoint) : Line[B]
+  def clone(start:SegmentPoint, end: SegmentPoint) : Line[B] = this
 
   def add(n: Int, outside: Boolean) = this
   def remove(n: Int, outside: Boolean) = this
