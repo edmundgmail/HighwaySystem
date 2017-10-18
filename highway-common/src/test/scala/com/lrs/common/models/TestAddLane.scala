@@ -79,8 +79,9 @@ class TestAddLane extends Testing with Logging{
     val lanes = List(
       Lane.fromString(direction4.rps, "RP1,-0.1,RP1,0.2,[1 2 3]").get,
       Lane.fromString(direction4.rps, "RP1,0.2,RP2,0.2,[1 2 3 4 5]").get,
-      Lane.fromString(direction4.rps, "RP2,0.2,RP3,0.3,[1 2 3 4]").get,
-      Lane.fromString(direction4.rps, "RP3,0.3,RP3,0.5,[1 2]").get
+      Lane.fromString(direction4.rps, "RP2,0.2,RP2,0.3,[1 2 3 4]").get,
+      Lane.fromString(direction4.rps, "RP2,0.3,RP3,0.3,[1 2]").get,
+      Lane.fromString(direction4.rps, "RP3,0.3,RP3,0.5,[1 2 3]").get
     )
 
     direction5.lanes should contain theSameElementsAs  lanes

@@ -183,18 +183,19 @@ class Direction(val dir: String, val segments: List[Segment], val rps: List[Refe
 
   def removeLane( start: SegmentPoint, end:SegmentPoint, n:Int, outside: Boolean) : Direction = {
     val newLane = new Lane(start, end, (1 to n).toList)
-    val overlapLanes = this.lanes.map(l=>l.getOverlap(rps, newLane)).flatten.map(f=>f.remove(n, outside))
-    val nonOverlaped = this.lanes.filterNot(l=>l.overlap(rps, newLane))
+    val overlapLanes1 = this.lanes.map(l=>l.getOverlap(rps, newLane)).flatten
+    val overlapLanes=overlapLanes1.map(f=>f.remove(n, outside))
+    //val nonOverlaped = this.lanes.filterNot(l=>l.overlap(rps, newLane))
     val overlapExcept = this.lanes.map(l=>l.except(rps, newLane)).flatten
 
-    Direction(this.dir, this.segments, this.rps, (overlapLanes ++ nonOverlaped ++ overlapExcept))
+    Direction(this.dir, this.segments, this.rps, (overlapLanes ++ overlapExcept))
   }
 
   def updateLane(inputString: String) : Direction = {
     val laneChangeRecord = Lane.parseLaneChangeRecord(rps, inputString)
     laneChangeRecord match {
       case Some(record) => {
-        if(record.n < 0) removeLane(record.start, record.end, record.n, record.outside)
+        if(record.n < 0) removeLane(record.start, record.end, 0 - record.n, record.outside)
         else addLane(record.start, record.end, record.n, record.outside)
       }
       case None => this
