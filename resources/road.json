@@ -37,5 +37,22 @@
     "segment" : "0.7, RP6,2.5,RP7,1.9,RP8,0.3",
     "leftConnect" : true,
     "rightConnect": true
+  },
+
+  {
+    "action" : "TransferSegmentRecord",
+    "dateTime" : "20170101 11:10:10",
+    "fromRoadName": "Hero High Way",
+    "fromRoadId" : 1,
+    "fromDir" : "E",
+    "startPoint" : {"rpName": "RP1", "offset":0.9},
+    "endPoint": {"rpName": "RP2", "offset": 1.3},
+    "toRoadName" : "",
+    "toRoadId" : 2,
+    "toDir" : "E",
+    "afterRP" : "RP1",
+    "beforeRP": "RP3",
+    "leftConnect" : true,
+    "rightConnect": true
   }
 ]

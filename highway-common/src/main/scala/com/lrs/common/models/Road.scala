@@ -23,7 +23,22 @@ class Road(val name:String, val roadId: Long, val mainDir: String, val direction
       Road(name, roadId, mainDir, dirs)
   }
 
-  def addSegment(dir:String, segment:String, afterRP:String, leftConnect:Boolean, beforeRP:String, rightConnect:Boolean) = ???
+  def addSegment(dir:String, segment:String, afterRPName:String, leftConnect:Boolean, beforeRPName:String, rightConnect:Boolean) = {
+    val afterRP = ReferencePoint(afterRPName, name, dir,0,0)
+    val beforeRP = ReferencePoint(beforeRPName, name, dir, 0, 0)
+    val dirs = directions.filterNot(_.dir==dir) ++ directions.filter(_.dir==dir).map(
+      d=>d.addSegmentString(name, segment, Some(afterRP), leftConnect, Some(beforeRP), rightConnect))
+    Road(name, roadId, mainDir, dirs)
+  }
+
+  def getSegmentString(dir: String, start: PointRecord, end: PointRecord) : String = ???
+
+ def updateLane(dir: String, lane: String)  = {
+   val dirs = directions.filterNot(_.dir==dir) ++ directions.filter(_.dir==dir).map(
+     d=>d.updateLane(lane))
+   Road(name, roadId, mainDir, dirs)
+ }
+
 }
 
 object Road{

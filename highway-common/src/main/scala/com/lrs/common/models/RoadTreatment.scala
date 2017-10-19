@@ -1,14 +1,24 @@
 package com.lrs.common.models
 
+import com.lrs.common.utils.JsonWritable
+
 /**
   * Created by vagrant on 10/18/17.
   */
 
-case class TreatmentDetail(layerNo: Int, material: String, materialDesign: String, thickness: Double)
-case class Treatment(desc: String, details: List[TreatmentDetail])
+case class TreatmentDetail(layerNo: Int, material: String, materialDesign: String, thickness: Double) extends JsonWritable
+case class Treatment(desc: String, details: List[TreatmentDetail]) extends JsonWritable
 
-class RoadTreatment{
-  var map: Map[Lane, Treatment] = _
+class RoadTreatment(roadId: Long, dir: String, map: Map[Lane, Treatment]) extends JsonWritable{
+  def addTreament(lane: Lane, treatment: Treatment): RoadTreatment = {
+    RoadTreatment(this.roadId, this.dir, this.map + (lane-> treatment) )
+  }
 
-  
+  def removeTreatment(lane: Lane) = {
+    this.map(this.map - lane)
+  }
+}
+
+object RoadTreatment{
+  def apply(roadId: Long, dir: String, map: Map[Lane, Treatment]): RoadTreatment = new RoadTreatment(roadId, dir, map)
 }

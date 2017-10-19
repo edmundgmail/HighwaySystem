@@ -23,6 +23,7 @@ import scala.concurrent.{Await, Future}
 
 object RecordProcessWorker{
   def props(actor:ActorRef): Props = Props(new RecordProcessWorker(recordPersistWorker = actor))
+
 }
 
 class RecordProcessWorker(recordPersistWorker: ActorRef) extends Actor with ActorLogging with Stash{
@@ -31,6 +32,16 @@ class RecordProcessWorker(recordPersistWorker: ActorRef) extends Actor with Acto
   gsonBuilder.registerTypeAdapter(classOf[DataRecord], DataRecordDeserializer.getInstance)
 
   val gson = gsonBuilder.create()
+
+  def handleTransferSegment(record: TransferSegmentRecord) : HighwayStatus.TypeVal = {
+    val fromRoad = MongoUtils.getRoad(record.fromRoadId)
+    val toRoad = MongoUtils.getRoad(record.toRoadId)
+    val segment = fromRoad.getSegmentString(record.fromDir, record.startPoint, record.endPoint)
+    val newfromRoad =fromRoad.removeSegment(record.fromDir, record.startPoint, record.endPoint)
+    val newToRoad = toRoad.addSegment(record.toDir, segment, record.afterRP, record.leftConnect, record.beforeRP, record.rightConnect)
+    val roadFeatures =
+  }
+
 
   override def receive = {
 
@@ -73,6 +84,22 @@ class RecordProcessWorker(recordPersistWorker: ActorRef) extends Actor with Acto
           catch {
             case e:Throwable => sender() ! HighwayStatus.CustomError(HighwayStatus.ErrorAddRoadSegment, e)
           }
+        }
+
+        case record: UpdateLaneRecord => {
+          try{
+            val road = MongoUtils.getRoad(record.roadId)
+            val newRoad = road.updateLane(record.dir, record.lane)
+            MongoUtils.updateRoad(newRoad)
+            sender() ! HighwayStatus.Ok
+          }
+          catch{
+            case e:Throwable => sender() ! HighwayStatus.CustomError(HighwayStatus.ErrorUpdateLane, e)
+          }
+        }
+
+        case record: TransferSegmentRecord => {
+          sender() ! handleTransferSegment(record)
         }
 
         case e : Throwable => sender() ! HighwayStatus.CustomError(HighwayStatus.ErrorParseRoadJson, e)
