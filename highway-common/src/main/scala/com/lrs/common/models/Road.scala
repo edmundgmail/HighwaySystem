@@ -14,6 +14,8 @@ class Road(val name:String, val roadId: Long, val mainDir: String, val direction
     s"{RoadName: $name mainDir:$mainDir directions: $directions"
   }
 
+  def getRps(dir: String) : List[ReferencePoint] = ???
+
   @throws(classOf[Exception])
   def removeSegment(dir:String, startPoint:PointRecord, endPoint:PointRecord) = {
       logger.info("trying to removeSegment")

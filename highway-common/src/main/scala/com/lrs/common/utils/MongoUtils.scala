@@ -12,7 +12,7 @@ import Implicits._
 import com.mongodb.client.model.BsonField
 import org.mongodb.scala.bson.BsonDocument
 import org.mongodb.scala.bson.conversions.Bson
-import org.mongodb.scala.model.BsonField
+import org.mongodb.scala.model.{BsonField, FindOneAndReplaceOptions}
 
 import scala.concurrent.duration.Duration
 
@@ -24,6 +24,7 @@ object  MongoUtils {
   val database: MongoDatabase = mongoClient.getDatabase("road")
   val collectionRoadRecordTable: MongoCollection[Document] = database.getCollection("RoadRecordTable")
   val collectionRoadTable: MongoCollection[Document] = database.getCollection("RoadTable")
+  val collectionRoadFeaturesTable: MongoCollection[Document] = database.getCollection("RoadFeaturesTable")
 
   def addHighwayRecord(record: JsObject) = {
     val doc : Document = Document.apply(record.toString)
@@ -63,12 +64,12 @@ object  MongoUtils {
   }
 
   def getRoad(roadId: Long) = {
-    val road = collectionRoadTable.find().projection(excludeId()).first().toFuture
+    val road = collectionRoadTable.find(equal("roadId", roadId)).projection(excludeId()).first().toFuture
     Await.result(road, Duration.Inf).asInstanceOf[Document]
   }
 
   def updateRoad(road: Road) = {
-    val newRoad = collectionRoadTable.findOneAndReplace(equal("roadId", road.roadId), road).toFuture
+    val newRoad = collectionRoadTable.findOneAndReplace(equal("roadId", road.roadId), road, new FindOneAndReplaceOptions().upsert(true)).toFuture
     Await.result(newRoad, Duration.Inf)
   }
 
@@ -77,4 +78,13 @@ object  MongoUtils {
     Await.result(newRoad, Duration.Inf)
   }
 
+  def updateRoadFeatures(roadFeatures: RoadFeatures) = {
+    val newRoadFeatures = collectionRoadFeaturesTable.findOneAndReplace(and(equal("roadId", roadFeatures.roadId), equal("dir", roadFeatures.dir)), roadFeatures, new FindOneAndReplaceOptions().upsert(true)).toFuture
+    Await.result(newRoadFeatures, Duration.Inf)
+  }
+
+  def getRoadFeatures(roadId: Long, dir: String) = {
+    val road = collectionRoadFeaturesTable.find(and(equal("roadId",roadId), equal("dir", dir))).projection(excludeId()).first().toFuture
+    Await.result(road, Duration.Inf).asInstanceOf[Document]
+  }
 }

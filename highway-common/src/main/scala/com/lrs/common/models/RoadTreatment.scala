@@ -15,7 +15,7 @@ class RoadTreatment(roadId: Long, dir: String, map: Map[Lane, Treatment]) extend
   }
 
   def removeTreatment(lane: Lane) = {
-    this.map(this.map - lane)
+    RoadTreatment(this.roadId, this.dir, this.map - lane)
   }
 }
 

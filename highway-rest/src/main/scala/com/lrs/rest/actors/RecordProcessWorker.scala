@@ -34,12 +34,34 @@ class RecordProcessWorker(recordPersistWorker: ActorRef) extends Actor with Acto
   val gson = gsonBuilder.create()
 
   def handleTransferSegment(record: TransferSegmentRecord) : HighwayStatus.TypeVal = {
-    val fromRoad = MongoUtils.getRoad(record.fromRoadId)
-    val toRoad = MongoUtils.getRoad(record.toRoadId)
-    val segment = fromRoad.getSegmentString(record.fromDir, record.startPoint, record.endPoint)
-    val newfromRoad =fromRoad.removeSegment(record.fromDir, record.startPoint, record.endPoint)
-    val newToRoad = toRoad.addSegment(record.toDir, segment, record.afterRP, record.leftConnect, record.beforeRP, record.rightConnect)
-    val roadFeatures =
+
+    try{
+      val fromRoad = MongoUtils.getRoad(record.fromRoadId)
+      val fromRps = fromRoad.getRps(record.fromDir)
+
+      val toRoad = MongoUtils.getRoad(record.toRoadId)
+
+      val segmentString = fromRoad.getSegmentString(record.fromDir, record.startPoint, record.endPoint)
+      val fromRoadFeatures = RoadFeatures.getRoadFeatures(record.fromRoadId, record.fromDir)
+
+      val newfromRoad =fromRoad.removeSegment(record.fromDir, record.startPoint, record.endPoint)
+      val newToRoad = toRoad.addSegment(record.toDir, segmentString, record.afterRP, record.leftConnect, record.beforeRP, record.rightConnect)
+
+      val toRoadFeatures = RoadFeatures.getRoadFeatures(record.toRoadId, record.toDir)
+      val transferedFeatures = fromRoadFeatures.getFeatures(fromRps, record.startPoint, record.endPoint)
+      val newFromRoadFeatures = fromRoadFeatures.removeFeature(fromRps, record.startPoint, record.endPoint)
+      val toRps = newToRoad.getRps(record.toDir)
+      val newToRoadFeatures = toRoadFeatures.addFeature(toRps, record.startPoint, record.endPoint, transferedFeatures)
+
+      MongoUtils.updateRoad(newToRoad)
+      MongoUtils.updateRoad(newfromRoad)
+      MongoUtils.updateRoadFeatures(newFromRoadFeatures)
+      MongoUtils.updateRoadFeatures(newToRoadFeatures)
+      HighwayStatus.Ok
+    }
+    catch {
+      case e : Throwable => HighwayStatus.ErrorTransferSegment
+    }
   }
 
 

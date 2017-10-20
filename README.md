@@ -8,8 +8,11 @@ docker network create mynet
 sudo docker run -p 0.0.0.0:27017:27017 --net=mynet --name roadmongo -d mongo
 
 sudo docker run -p 0.0.0.0:5000:5000 --net=mynet --name highwy-rest -d  ddp/highway-rest:0e2286ec97016e3a04c6687859df9fca8327d402-SNAPSHOT
-~
 
+
+assumptions:
+1. the newly added segment always have at least 1 new RP defined
+2. transfered segment at least 1 RP
 
 # HighwaySystem
 

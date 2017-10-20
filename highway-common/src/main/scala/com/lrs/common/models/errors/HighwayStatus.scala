@@ -13,6 +13,7 @@ object HighwayStatus extends Enumeration {
   val ErrorPersistRoad = TypeVal("Error in persisting road", 6)
   val ErrorGetRoad = TypeVal("Error in getting road", 7)
   val ErrorUpdateLane = TypeVal("Error in updating lanes", 8)
+  val ErrorTransferSegment = TypeVal("Error in transfering Segment", 9)
 
   def CustomError(t : TypeVal, e: Throwable) = TypeVal(t.msg, t.code, Some(e.getMessage))
 
