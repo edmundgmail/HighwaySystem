@@ -39,7 +39,7 @@ val amazonAws 			  = "com.amazonaws" 				  % "aws-java-sdk-sqs" 					% "1.11.9"
 val mongoDBJava = "org.mongodb" % "mongodb-driver-async" % "3.5.0" % "compile"
 val mongoDB = "org.mongodb.scala" % "mongo-scala-driver_2.11" % "2.0.0" % "compile"
 val rxJava = "io.reactivex" % "rxjava" % "1.0.2" % "compile"
-
+val cors  = "ch.megard" %% "akka-http-cors" % "0.2.2" % "compile"
 
 
 /**
@@ -109,7 +109,7 @@ lazy val streaming = (project in file("highway-streaming")).
 lazy val rest = (project in file("highway-rest")).
   settings(commonSettings: _*).
   settings(
-    libraryDependencies ++= Seq( json4s, akkaActor, akkaHttp,akkaHttpTest, akkaHttpSprayJson, akkaStream,akkaSlf4j, amazonAws, scalaTest, scalaMock),
+    libraryDependencies ++= Seq( json4s, akkaActor, akkaHttp,akkaHttpTest, akkaHttpSprayJson, akkaStream,akkaSlf4j, amazonAws, scalaTest, scalaMock, cors),
     mainClass in Compile := Some("com.lrs.rest.AkkaHttpScalaDockerSeed"),
     mainClass in run := Some("com.lrs.rest.AkkaHttpScalaDockerSeed")
   ).dependsOn(common % "compile->compile;test->test")
