@@ -14,6 +14,7 @@ import spray.json.{JsObject, JsValue}
 
 import scala.concurrent.{ExecutionContextExecutor, Future}
 import scala.concurrent.duration._
+import ch.megard.akka.http.cors.scaladsl.CorsDirectives._
 
 class HighwayRoutes(recordPersistWorker: ActorRef, recordProcessWorker: ActorRef)
                    (implicit system: ActorSystem, ec: ExecutionContextExecutor) {
@@ -21,7 +22,7 @@ class HighwayRoutes(recordPersistWorker: ActorRef, recordProcessWorker: ActorRef
   implicit val timeout = Timeout(10.seconds)
   implicit val log = system.log
 
-  def routes: Route = {
+  def routes: Route = cors(){
 
     pathPrefix("highway") {
       (path("rps") & get){
