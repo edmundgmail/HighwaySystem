@@ -41,7 +41,6 @@ val mongoDB = "org.mongodb.scala" % "mongo-scala-driver_2.11" % "2.0.0" % "compi
 val rxJava = "io.reactivex" % "rxjava" % "1.0.2" % "compile"
 val cors  = "ch.megard" %% "akka-http-cors" % "0.2.2" % "compile"
 
-
 /**
   * Shared settings for all the projects
   */

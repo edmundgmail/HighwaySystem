@@ -16,7 +16,6 @@ import scala.concurrent.{ExecutionContextExecutor, Future}
 import scala.concurrent.duration._
 import ch.megard.akka.http.cors.scaladsl.CorsDirectives._
 
-
 class HighwayRoutes(recordPersistWorker: ActorRef, recordProcessWorker: ActorRef)
                    (implicit system: ActorSystem, ec: ExecutionContextExecutor) {
 
