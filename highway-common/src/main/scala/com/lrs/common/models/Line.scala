@@ -76,7 +76,8 @@ abstract class Line[B<:Line[B]]{
   }
 
   def except(rps: List[ReferencePoint], those: List[ B]) : List[B] = {
-      those.foldRight[List[B]](List(this)){
+      if(those.isEmpty) List(this)
+      else those.foldRight[List[B]](List(this)){
         (line : B , lines : List[B ]) => {
           lines.map(result=> result.except(rps, line)).flatten.toList
         }
