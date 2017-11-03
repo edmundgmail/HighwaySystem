@@ -6,7 +6,7 @@ import com.lrs.common.utils.{AssertException, JsonWritable}
   * Created by vagrant on 10/13/17.
   */
 case class Lane(val start: SegmentPoint, val end: SegmentPoint, val indexes: List[Int] = List.empty) extends Line[Lane] with JsonWritable {
-  override def add(n: Int, outside: Boolean = true): Line[Lane] = {
+  override def add(n: Int, outside: Boolean = true): Lane = {
     (this.indexes.isEmpty, outside) match {
       case (true, _) => Lane(this.start, this.end, (1 to n).toList)
       case (_, true) => Lane(this.start, this.end, this.indexes ++ (this.indexes.last + 1 to this.indexes.last+n).toList)
@@ -18,7 +18,7 @@ case class Lane(val start: SegmentPoint, val end: SegmentPoint, val indexes: Lis
     this.copy(start = start, end = end)
   }
 
-  override def remove(n: Int, outside: Boolean = true) : Line[Lane]  = {
+  override def remove(n: Int, outside: Boolean = true) : Lane  = {
     AssertException(!this.indexes.isEmpty  && this.indexes.length >= n)
     outside match {
       case true => Lane(this.start, this.end, this.indexes.slice(0, this.indexes.length - n))
@@ -29,7 +29,7 @@ case class Lane(val start: SegmentPoint, val end: SegmentPoint, val indexes: Lis
 
 }
 
-case class LaneChangeRecord(override val start: SegmentPoint, override  val end: SegmentPoint, n: Int, outside : Boolean) extends Line[Lane]
+case class LaneChangeRecord(val start: SegmentPoint,  val end: SegmentPoint, n: Int, outside : Boolean)
 
 object Lane {
 

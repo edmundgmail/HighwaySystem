@@ -7,7 +7,7 @@ import com.lrs.common.utils.{JsonReadable, JsonWritable}
 /**
   * Created by eguo on 8/26/17.
   */
-class Road(val name:String, val roadId: Long, val mainDir: String, val directions: List[Direction]) extends JsonWritable with Logging{
+case class Road(val name:String, val roadId: Long, val mainDir: String, val directions: List[Direction] = List.empty) extends JsonWritable with Logging{
   def withUpdatedDirections(newDirections:List[Direction]) = new Road(name , roadId, mainDir, newDirections)
 
   override def toString: String = {
@@ -44,8 +44,6 @@ class Road(val name:String, val roadId: Long, val mainDir: String, val direction
 }
 
 object Road{
-  def apply(name:String, roadId: Long, mainDir: String, directions: List[Direction]): Road = new Road(name, roadId, mainDir, directions)
-
   def fromJson(record: AddRoadRecord) : Road = {
     Road(record.roadName, record.roadId, record.mainDir, record.directions.map(d=>Direction.fromString(record.roadName, d.dir, d.segments.toList)).toList)
   }

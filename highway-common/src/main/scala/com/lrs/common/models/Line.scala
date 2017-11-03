@@ -6,7 +6,7 @@ import com.lrs.common.utils.AssertException
   * Created by vagrant on 10/13/17.
   */
 abstract class Line[B<:Line[B]]{
-  self: Line[B] =>
+  self: B =>
 
   val start : SegmentPoint
   val end : SegmentPoint
@@ -22,7 +22,7 @@ abstract class Line[B<:Line[B]]{
       (thisEnd.get.globalOffset+end.offset >= thatRP.get.globalOffset+that.offset)
   }
 
-  def overlap(rps: List[ReferencePoint], that: Line[B]) : Boolean = {
+  def overlap(rps: List[ReferencePoint], that: B) : Boolean = {
     this.contains(rps, that.start) || this.contains(rps, that.end) || that.contains(rps, this.start) /*|| that.contains(rps, this.end)*/
   }
 
@@ -38,7 +38,7 @@ abstract class Line[B<:Line[B]]{
   }
 
 
-  def getOverlap(rps: List[ReferencePoint], that: Line[B]) : Option[Line[B]] = {
+  def getOverlap(rps: List[ReferencePoint], that: B) : Option[B] = {
     if(this.overlap(rps, that)) {
         if(this.contains(rps, that)) Some(this.clone(that.start, that.end))
         else if(that.contains(rps, this)) Some(this)
@@ -53,12 +53,12 @@ abstract class Line[B<:Line[B]]{
       None
   }
 
-  def clone(start:SegmentPoint, end: SegmentPoint) : Line[B] = this
+  def clone(start:SegmentPoint, end: SegmentPoint) : B = this
 
   def add(n: Int, outside: Boolean) = this
   def remove(n: Int, outside: Boolean) = this
 
-  def except (rps:List[ReferencePoint], that: Line[B]) : List[Line[B]] = {
+  def except (rps:List[ReferencePoint], that: B) : List[B] = {
     if(this.overlap(rps, that)) {
       (isBefore(rps, this.start, that.start), isBefore(rps, this.end, that.end)) match {
         case (1, -1) => List(this.clone(this.start, that.start), this.clone(that.end,this.end))
@@ -71,20 +71,20 @@ abstract class Line[B<:Line[B]]{
       List(this)
   }
 
-  def getOverlap(rps: List[ReferencePoint], lines : List[Line[B]]) : List[Line[B]] = {
+  def getOverlap(rps: List[ReferencePoint], lines : List[B]) : List[B] = {
     lines.map(line=>this.getOverlap(rps, line)).filter(_.isDefined).map(_.get)
   }
 
-  def except(rps: List[ReferencePoint], those: List[ Line[B]]) : List[Line[B] ] = {
-      those.foldRight[List[Line[B]]](List(this)){
-        (line : Line[B] , lines : List[Line[B] ]) => {
+  def except(rps: List[ReferencePoint], those: List[ B]) : List[B] = {
+      those.foldRight[List[B]](List(this)){
+        (line : B , lines : List[B ]) => {
           lines.map(result=> result.except(rps, line)).flatten.toList
         }
       }
   }
 
   @throws(classOf[Exception])
-  def contains(rps: List[ReferencePoint], seg: Line[B] ) : Boolean = {
+  def contains(rps: List[ReferencePoint], seg: B ) : Boolean = {
     val thisStart = ReferencePoint.getByID(start.referencePoint, rps)
     val thisEnd = ReferencePoint.getByID(end.referencePoint, rps)
     val thatStart = ReferencePoint.getByID(seg.start.referencePoint, rps)
