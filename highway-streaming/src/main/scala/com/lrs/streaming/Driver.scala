@@ -4,9 +4,9 @@ import java.io.File
 
 import com.google.gson.GsonBuilder
 import com.lrs.common.ConfigFields
+import com.lrs.common.dao.MongoUtils
 import com.lrs.common.logging.Logging
 import com.lrs.common.models.{DataRecord, DataRecordDeserializer, Road}
-import com.lrs.common.utils.{MongoUtils}
 import com.lrs.streaming.processor.RoadProcessor
 import com.lrs.streaming.utils.MongoMonitor
 import com.typesafe.config.{Config, ConfigFactory}

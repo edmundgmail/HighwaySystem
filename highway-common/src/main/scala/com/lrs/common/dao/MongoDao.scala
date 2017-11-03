@@ -8,7 +8,7 @@ import com.lrs.common.models._
 
 import scala.concurrent.{ExecutionContext, Future}
 import reactivemongo.api.{DefaultDB, MongoConnection, MongoDriver}
-import reactivemongo.bson.{BSONDocumentReader, BSONDocumentWriter, Macros, document}
+import reactivemongo.bson.{BSONDocument, BSONDocumentReader, BSONDocumentWriter, BSONObjectID, Macros, document}
 
 object MongoDao{
   // My settings (see available connection options)
@@ -35,8 +35,18 @@ object MongoDao{
   implicit def refWriter: BSONDocumentWriter[ReferencePoint] = Macros.writer[ReferencePoint]
   implicit def laneWriter: BSONDocumentWriter[Lane] = Macros.writer[Lane]
 
-  // or provide a custom one
+  implicit object roadReader extends BSONDocumentReader[Road] {
+    def read(doc: BSONDocument): Road = {
+      val id = doc.getAs[BSONObjectID]("_id").get
+      val name = doc.getAs[String]("name").get
+      val roadId = doc.getAs[Int]("roadId").get
+      val mainDir = doc.getAs[String]("mainDir").get
 
+      Road(name, roadId, mainDir)
+    }
+  }
+
+  // or provide a custom one
   def createRoad(road: Road): Future[Unit] =
     roadCollection.flatMap(_.insert(road).map(_ => {})) // use personWriter
 
@@ -48,5 +58,8 @@ object MongoDao{
     roadCollection.flatMap(_.update(selector, road).map(_.n))
   }
 
-
+  def findRoadById(roadId: Long): Future[Road] =
+      roadCollection.flatMap(_.find(BSONDocument(
+        "roadId" -> roadId
+      )).requireOne[Road])
 }

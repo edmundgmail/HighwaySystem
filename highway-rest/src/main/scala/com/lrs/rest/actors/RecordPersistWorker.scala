@@ -2,9 +2,9 @@ package com.lrs.rest.actors
 
 import akka.actor.{Actor, ActorLogging, Props, Stash}
 import akka.pattern.pipe
+import com.lrs.common.dao.MongoUtils
 import com.lrs.common.models.errors.HighwayStatus
 import com.lrs.common.models.{AddRoadRecord, DataRecord}
-import com.lrs.common.utils.MongoUtils
 import com.lrs.rest.actors.RecordPersistWorker.{AddHighway, GetHighway, GetHighwayRPs, GetHighwaySegments}
 
 import scala.concurrent.ExecutionContext.Implicits.global

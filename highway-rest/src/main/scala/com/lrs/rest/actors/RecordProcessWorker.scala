@@ -3,13 +3,14 @@ package com.lrs.rest.actors
 import akka.actor.SupervisorStrategy.{Escalate, Stop}
 import akka.actor.{Actor, ActorLogging, ActorRef, OneForOneStrategy, Props, Stash, Status}
 import com.lrs.common.models._
-import com.lrs.common.utils.{JsonReadable, MongoUtils}
+import com.lrs.common.utils.JsonReadable
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.{Failure, Success, Try}
 import com.lrs.common.utils.Implicits._
 import akka.pattern.pipe
 import com.google.gson.GsonBuilder
+import com.lrs.common.dao.MongoUtils
 import com.lrs.common.models.errors.{ExternalResourceException, ExternalResourceNotFoundException, HighwayStatus}
 import org.joda.time
 import org.joda.time.Seconds

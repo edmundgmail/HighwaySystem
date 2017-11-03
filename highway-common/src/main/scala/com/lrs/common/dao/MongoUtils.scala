@@ -1,20 +1,16 @@
-package com.lrs.common.utils
+package com.lrs.common.dao
+
 import com.lrs.common.models._
-import org.mongodb.scala.{Document, MongoClient, MongoCollection, MongoDatabase}
+import org.mongodb.scala.model.Accumulators._
 import org.mongodb.scala.model.Aggregates._
 import org.mongodb.scala.model.Filters._
+import org.mongodb.scala.model.FindOneAndReplaceOptions
 import org.mongodb.scala.model.Projections._
-import org.mongodb.scala.model.Accumulators._
+import org.mongodb.scala.{Document, MongoClient, MongoCollection, MongoDatabase}
 import spray.json._
 
-import scala.concurrent.{Await, ExecutionContext, Future}
-import Implicits._
-import com.mongodb.client.model.BsonField
-import org.mongodb.scala.bson.BsonDocument
-import org.mongodb.scala.bson.conversions.Bson
-import org.mongodb.scala.model.{BsonField, FindOneAndReplaceOptions}
-
 import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, ExecutionContext}
 
 /**
   * Created by eguo on 9/21/17.
