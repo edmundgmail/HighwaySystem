@@ -10,7 +10,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import reactivemongo.api.{DefaultDB, MongoConnection, MongoDriver}
 import reactivemongo.bson.{BSONDocumentReader, BSONDocumentWriter, Macros, document}
 
-object MongoDao extends App{
+object MongoDao{
   // My settings (see available connection options)
   val mongoUri = "mongodb://localhost:27017/road"
 
