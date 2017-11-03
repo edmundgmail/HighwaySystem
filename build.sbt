@@ -40,7 +40,7 @@ val mongoDBJava = "org.mongodb" % "mongodb-driver-async" % "3.5.0" % "compile"
 val mongoDB = "org.mongodb.scala" % "mongo-scala-driver_2.11" % "2.0.0" % "compile"
 val rxJava = "io.reactivex" % "rxjava" % "1.0.2" % "compile"
 val cors = "ch.megard" %% "akka-http-cors" % "0.2.2"
-
+val reactivemongo = "org.reactivemongo" % "reactivemongo_2.11" % "0.12.7"
 
 
 /**
@@ -83,7 +83,7 @@ lazy val common = (project in file("highway-common")).
   settings(
     unmanagedBase := baseDirectory.value / "lib",
     libraryDependencies ++= Seq(json4s,gson,  akkaHttpSprayJson, mongoDB,jacksonCore, jacksonDatabind, jacksonScala, jodaTime, typesafeConfig, logBack,
-      scalaTest, scalaMock, mockito)
+      scalaTest, scalaMock, mockito,reactivemongo)
   )
 
 /**

@@ -6,7 +6,7 @@ import org.json4s.JsonWriter
 /**
   * Created by eguo on 8/26/17.
   */
-class Direction(val dir: String, val segments: List[Segment], val rps: List[ReferencePoint], val lanes: List[Line[Lane]]) extends JsonWritable{
+case class Direction(val dir: String, val segments: List[Segment] = List.empty, val rps: List[ReferencePoint] = List.empty, val lanes: List[Lane] = List.empty) extends JsonWritable{
   @throws(classOf[Exception])
   def removeSegment(start: SegmentPoint, end:SegmentPoint, removeRP:Boolean = true) : Direction = {
       val segment= Segment(start, end, 0)
@@ -173,18 +173,18 @@ class Direction(val dir: String, val segments: List[Segment], val rps: List[Refe
 
   def addLane(start: SegmentPoint, end:SegmentPoint, n:Int, outside: Boolean) : Direction = {
     val newLane = new Lane(start, end, (1 to n ).toList)
-    val newLanes = newLane.except(rps, this.lanes)
-    val overlapLanes = this.lanes.map(l=>l.getOverlap(rps, newLane)).flatten.map(f=>f.add(n, outside))
-    val nonOverlaped = this.lanes.filterNot(l=>l.overlap(rps, newLane))
-    val overlapExcept = this.lanes.map(l=>l.except(rps, newLane)).flatten
+    val newLanes : List[Lane] = newLane.except(rps, this.lanes)
+    val overlapLanes : List[Lane] = this.lanes.map(l=>l.getOverlap(rps, newLane)).flatten.map(f=>f.add(n, outside))
+    val nonOverlaped : List[Lane] = this.lanes.filterNot(l=>l.overlap(rps, newLane))
+    val overlapExcept : List[Lane] = this.lanes.map(l=>l.except(rps, newLane)).flatten
 
     Direction(this.dir,  this.segments, this.rps, (newLanes ++ overlapLanes ++ nonOverlaped ++ overlapExcept))
   }
 
   def removeLane( start: SegmentPoint, end:SegmentPoint, n:Int, outside: Boolean) : Direction = {
     val newLane = new Lane(start, end, (1 to n).toList)
-    val overlapLanes1 = this.lanes.map(l=>l.getOverlap(rps, newLane)).flatten
-    val overlapLanes=overlapLanes1.map(f=>f.remove(n, outside))
+    val overlapLanes1  : List[Lane] = this.lanes.map(l=>l.getOverlap(rps, newLane)).flatten
+    val overlapLanes : List[Lane] =overlapLanes1.map(f=>f.remove(n, outside))
     //val nonOverlaped = this.lanes.filterNot(l=>l.overlap(rps, newLane))
     val overlapExcept = this.lanes.map(l=>l.except(rps, newLane)).flatten
 
@@ -205,8 +205,6 @@ class Direction(val dir: String, val segments: List[Segment], val rps: List[Refe
 }
 
 object Direction{
-  def apply(dir:String, segments:List[Segment], rps: List[ReferencePoint], lanes: List[Line[Lane]] = List.empty) = new Direction(dir, segments, rps, lanes)
-
   def fromString(roadName:String, dir:String, road: List[String]) : Direction = {
     val (_segs, _rps) = road.map(str=>Segment.fromString(roadName, dir, str)).unzip
     val segOffsets = _segs.zipWithIndex.map(s=>_segs.take(s._2).map(_.length).sum)
