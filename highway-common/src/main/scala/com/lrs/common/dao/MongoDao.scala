@@ -10,7 +10,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import reactivemongo.api.{DefaultDB, MongoConnection, MongoDriver}
 import reactivemongo.bson.{BSONDocument, BSONDocumentReader, BSONDocumentWriter, BSONObjectID, Macros, document}
 
-object MongoDao{
+object MongoDao {
   // My settings (see available connection options)
   val mongoUri = "mongodb://localhost:27017/road"
 
@@ -23,23 +23,30 @@ object MongoDao{
 
   // Database and collections: Get references
   val futureConnection = Future.fromTry(connection)
+
   def db1: Future[DefaultDB] = futureConnection.flatMap(_.database("road"))
+
   def roadCollection = db1.map(_.collection("RoadTable"))
 
   // Write Documents: insert or update
 
   implicit def roadWriter: BSONDocumentWriter[Road] = Macros.writer[Road]
+
   implicit def dirWriter: BSONDocumentWriter[Direction] = Macros.writer[Direction]
+
   implicit def segWriter: BSONDocumentWriter[Segment] = Macros.writer[Segment]
+
   implicit def segpWriter: BSONDocumentWriter[SegmentPoint] = Macros.writer[SegmentPoint]
+
   implicit def refWriter: BSONDocumentWriter[ReferencePoint] = Macros.writer[ReferencePoint]
+
   implicit def laneWriter: BSONDocumentWriter[Lane] = Macros.writer[Lane]
 
   implicit object roadReader extends BSONDocumentReader[Road] {
     def read(doc: BSONDocument): Road = {
       val id = doc.getAs[BSONObjectID]("_id").get
       val name = doc.getAs[String]("name").get
-      val roadId = doc.getAs[Int]("roadId").get
+      val roadId = doc.getAs[Long]("roadId").get
       val mainDir = doc.getAs[String]("mainDir").get
 
       Road(name, roadId, mainDir)
@@ -50,7 +57,7 @@ object MongoDao{
   def createRoad(road: Road): Future[Unit] =
     roadCollection.flatMap(_.insert(road).map(_ => {})) // use personWriter
 
-  def updateRoad(road:Road): Future[Int] = {
+  def updateRoad(road: Road): Future[Int] = {
     val selector = document(
       "name" -> road.name
     )
@@ -59,6 +66,12 @@ object MongoDao{
   }
 
   def findRoadById(roadId: Long): Future[Road] =
-      roadCollection.flatMap(_.find(BSONDocument(
-        "roadId" -> roadId
-      )).requireOne[Road])
+    roadCollection.flatMap(_.find(BSONDocument(
+      "roadId" -> roadId
+    )).requireOne[Road])
+
+  def findPersonByAge(roadId: Int): Future[List[Road]] =
+    roadCollection.flatMap(_.find(document("roadId" -> roadId)). // query builder
+      cursor[Road]().collect[List]()) // collect using the result cursor
+  //
+}
