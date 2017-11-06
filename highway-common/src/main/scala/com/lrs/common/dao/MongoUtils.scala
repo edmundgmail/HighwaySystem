@@ -11,7 +11,7 @@ import spray.json._
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext}
-
+import com.lrs.common.utils.Implicits._
 /**
   * Created by eguo on 9/21/17.
   */

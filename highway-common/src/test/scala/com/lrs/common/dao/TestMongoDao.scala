@@ -9,9 +9,12 @@ import com.lrs.common.utils.Testing
 class TestMongoDao extends Testing with Logging{
 
   it("should add record properly") {
-      val TEST_ROAD = Road("Test", 1, "E")
+      val TEST_ROAD = Road("Test", 11, "E")
       MongoDao.createRoad(TEST_ROAD)
       val road = MongoDao.findRoadById(1)
-      road shouldEqual TEST_ROAD
+
+      road.onSuccess(
+        ret => ret shouldEqual TEST_ROAD
+      )
   }
 }

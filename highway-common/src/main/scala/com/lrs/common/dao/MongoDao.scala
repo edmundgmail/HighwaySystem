@@ -62,4 +62,3 @@ object MongoDao{
       roadCollection.flatMap(_.find(BSONDocument(
         "roadId" -> roadId
       )).requireOne[Road])
-}
